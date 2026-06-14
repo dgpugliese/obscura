@@ -414,12 +414,12 @@ function generatePassphrase() {
   const n = () => String(secureRandInt(100)).padStart(2, "0");
   return [w(), w(), n(), w()].join("-");
 }
-function b64uEncode(bytes) {
+export function b64uEncode(bytes) {
   let s = "";
   for (let i = 0; i < bytes.length; i++) s += String.fromCharCode(bytes[i]);
   return btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 }
-function b64uDecode(s) {
+export function b64uDecode(s) {
   s = s.replace(/-/g, "+").replace(/_/g, "/");
   while (s.length % 4) s += "=";
   const bin = atob(s);
@@ -615,10 +615,10 @@ function hexLine(bytes) {
   }
   return s;
 }
-const BUILD_SHA = true ? "db4d96c" : "dev";
+const BUILD_SHA = true ? "7f4be5c" : "dev";
 const MARKETING_MODE = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("marketing") === "1";
-const BUILD_TIME = true ? "2026-05-12T03:29:41Z" : "";
-const BUILD_VERSION = true ? "v0.1.1" : "dev";
+const BUILD_TIME = true ? "2026-06-14T22:51:10Z" : "";
+const BUILD_VERSION = true ? "dev" : "dev";
 function useNarrow(threshold = 720) {
   const [narrow, setNarrow] = useState(() => typeof window !== "undefined" && window.innerWidth < threshold);
   useEffect(() => {
