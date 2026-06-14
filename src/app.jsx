@@ -575,7 +575,7 @@ function fmtThroughput(bytes, ms) {
   return mbps.toFixed(1) + " MB/s";
 }
 
-function fmtBytes(b) {
+export function fmtBytes(b) {
   if (b == null) return "—";
   if (b < 1024) return b + " B";
   if (b < 1024 * 1024) return (b / 1024).toFixed(1) + " KB";
