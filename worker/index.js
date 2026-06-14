@@ -405,6 +405,6 @@ function randomHexId(bytes) {
   return s;
 }
 
-function jerr(status, message) {
+export function jerr(status, message) {
   return Response.json({ error: message }, { status });
 }
