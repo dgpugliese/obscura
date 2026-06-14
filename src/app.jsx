@@ -561,7 +561,7 @@ function shannonEntropy(bytes) {
   return h;
 }
 
-function fmtMs(ms) {
+export function fmtMs(ms) {
   if (ms == null) return "—";
   if (ms < 1) return "<1ms";
   if (ms < 1000) return Math.round(ms) + "ms";
