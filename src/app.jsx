@@ -375,11 +375,19 @@ function b64uEncode(bytes) {
   return btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 }
 function b64uDecode(s) {
-  s = s.replace(/-/g, "+").replace(/_/g, "/");
-  while (s.length % 4) s += "=";
-  const bin = atob(s);
-  const out = new Uint8Array(bin.length);
-  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+  const str = s.replace(/-/g, "+").replace(/_/g, "/").replace(/=/g, "");
+  const out = new Uint8Array((str.length * 3) >>> 2);
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+  for (let i = 0, j = 0; i < str.length; i += 4) {
+    const c1 = chars.indexOf(str[i]);
+    const c2 = chars.indexOf(str[i + 1] || "A");
+    const c3 = chars.indexOf(str[i + 2] || "A");
+    const c4 = chars.indexOf(str[i + 3] || "A");
+    const n = (c1 << 18) | (c2 << 12) | (c3 << 6) | c4;
+    out[j++] = (n >> 16) & 255;
+    if (j < out.length) out[j++] = (n >> 8) & 255;
+    if (j < out.length) out[j++] = n & 255;
+  }
   return out;
 }
 
