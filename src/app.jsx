@@ -1831,14 +1831,14 @@ function App() {
   // Window-level drag handling
   useEffect(() => {
     const onEnter = (e) => {
-      if (e.dataTransfer && Array.from(e.dataTransfer.types || []).includes("Files")) {
+      if (e.dataTransfer && Array.prototype.includes.call(e.dataTransfer.types || [], "Files")) {
         e.preventDefault();
         dragDepth.current += 1;
         setScreen((s) => (s === "empty" ? "drag" : s));
       }
     };
     const onOver = (e) => {
-      if (e.dataTransfer && Array.from(e.dataTransfer.types || []).includes("Files")) {
+      if (e.dataTransfer && Array.prototype.includes.call(e.dataTransfer.types || [], "Files")) {
         e.preventDefault();
       }
     };
@@ -2323,13 +2323,13 @@ function DecryptApp({ keyBytes, id, passphraseMode }) {
 
   useEffect(() => {
     const onEnter = (e) => {
-      if (e.dataTransfer && Array.from(e.dataTransfer.types || []).includes("Files")) {
+      if (e.dataTransfer && Array.prototype.includes.call(e.dataTransfer.types || [], "Files")) {
         e.preventDefault();
         dragDepth.current += 1;
       }
     };
     const onOver = (e) => {
-      if (e.dataTransfer && Array.from(e.dataTransfer.types || []).includes("Files")) e.preventDefault();
+      if (e.dataTransfer && Array.prototype.includes.call(e.dataTransfer.types || [], "Files")) e.preventDefault();
     };
     const onLeave = () => { dragDepth.current = Math.max(0, dragDepth.current - 1); };
     const onDrop = (e) => {
