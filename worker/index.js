@@ -326,7 +326,7 @@ async function sweepOrphans(env) {
 
 const STAT_TTL_SEC = 90 * 24 * 3600;
 
-function todayUTC() {
+export function todayUTC() {
   return new Date().toISOString().slice(0, 10);
 }
 
