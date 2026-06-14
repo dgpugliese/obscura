@@ -391,7 +391,7 @@ async function handleTransparency(env) {
   );
 }
 
-function clampInt(raw, min, max, fallback) {
+export function clampInt(raw, min, max, fallback) {
   const n = parseInt(raw, 10);
   if (!Number.isFinite(n)) return fallback;
   return Math.max(min, Math.min(max, n));
