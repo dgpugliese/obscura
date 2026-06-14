@@ -615,7 +615,7 @@ function useNarrow(threshold = 720) {
   return narrow;
 }
 
-function clampNum(n, min, max, fallback) {
+export function clampNum(n, min, max, fallback) {
   if (!Number.isFinite(n)) return fallback;
   return Math.max(min, Math.min(max, n));
 }
