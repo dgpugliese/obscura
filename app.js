@@ -615,10 +615,10 @@ function hexLine(bytes) {
   }
   return s;
 }
-const BUILD_SHA = true ? "db4d96c" : "dev";
+const BUILD_SHA = true ? "7f4be5c" : "dev";
 const MARKETING_MODE = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("marketing") === "1";
-const BUILD_TIME = true ? "2026-05-12T03:29:41Z" : "";
-const BUILD_VERSION = true ? "v0.1.1" : "dev";
+const BUILD_TIME = true ? "2026-06-14T23:02:30Z" : "";
+const BUILD_VERSION = true ? "dev" : "dev";
 function useNarrow(threshold = 720) {
   const [narrow, setNarrow] = useState(() => typeof window !== "undefined" && window.innerWidth < threshold);
   useEffect(() => {
@@ -1192,32 +1192,8 @@ function HeroCompose({ onSend, onClose }) {
     "ENCRYPT \u2192"
   )));
 }
-function HeroSettings({ ttl, setTtl, maxDL, setMaxDL, passEnabled, setPassEnabled, passphrase, setPassphrase, onClose, narrow = false }) {
+function SettingCardTTL({ ttl, setTtl }) {
   return /* @__PURE__ */ React.createElement("div", { style: {
-    minHeight: 360,
-    borderRadius: 6,
-    border: `1px solid ${theme.borderHi}`,
-    background: theme.panel,
-    padding: narrow ? 16 : 22,
-    display: "flex",
-    flexDirection: "column",
-    gap: narrow ? 14 : 18
-  } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 } }, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "var(--mono)", fontSize: 10, color: theme.inkFaint, letterSpacing: "0.2em", textTransform: "uppercase" } }, "dispatch parameters"), /* @__PURE__ */ React.createElement("button", { onClick: onClose, style: {
-    padding: "6px 12px",
-    border: `1px solid ${theme.border}`,
-    background: theme.panelHi,
-    color: theme.inkDim,
-    fontFamily: "var(--mono)",
-    fontSize: 10,
-    letterSpacing: "0.18em",
-    textTransform: "uppercase",
-    borderRadius: 3,
-    cursor: "pointer"
-  } }, "\u2190 back")), /* @__PURE__ */ React.createElement("div", { style: {
-    display: "grid",
-    gridTemplateColumns: narrow ? "1fr" : "1fr 1fr 1fr",
-    gap: narrow ? 14 : 22
-  } }, /* @__PURE__ */ React.createElement("div", { style: {
     padding: 14,
     border: `1px solid ${theme.border}`,
     borderRadius: 4,
@@ -1231,7 +1207,10 @@ function HeroSettings({ ttl, setTtl, maxDL, setMaxDL, passEnabled, setPassEnable
     fontSize: 11,
     borderRadius: 3,
     cursor: "pointer"
-  } }, n, "h"))), /* @__PURE__ */ React.createElement("div", { style: { marginTop: 12, fontFamily: "var(--mono)", fontSize: 10, color: theme.inkDim, lineHeight: 1.7 } }, "after which all ciphertext", /* @__PURE__ */ React.createElement("br", null), "is unrecoverable.")), /* @__PURE__ */ React.createElement("div", { style: {
+  } }, n, "h"))), /* @__PURE__ */ React.createElement("div", { style: { marginTop: 12, fontFamily: "var(--mono)", fontSize: 10, color: theme.inkDim, lineHeight: 1.7 } }, "after which all ciphertext", /* @__PURE__ */ React.createElement("br", null), "is unrecoverable."));
+}
+function SettingCardDownloads({ maxDL, setMaxDL }) {
+  return /* @__PURE__ */ React.createElement("div", { style: {
     padding: 14,
     border: `1px solid ${theme.border}`,
     borderRadius: 4,
@@ -1246,7 +1225,10 @@ function HeroSettings({ ttl, setTtl, maxDL, setMaxDL, passEnabled, setPassEnable
     fontSize: 11,
     borderRadius: 3,
     cursor: "pointer"
-  } }, n, "x"))), /* @__PURE__ */ React.createElement("div", { style: { marginTop: 12, fontFamily: "var(--mono)", fontSize: 10, color: theme.inkDim, lineHeight: 1.7 } }, "link self-destructs after", /* @__PURE__ */ React.createElement("br", null), "final read.")), /* @__PURE__ */ React.createElement("div", { style: {
+  } }, n, "x"))), /* @__PURE__ */ React.createElement("div", { style: { marginTop: 12, fontFamily: "var(--mono)", fontSize: 10, color: theme.inkDim, lineHeight: 1.7 } }, "link self-destructs after", /* @__PURE__ */ React.createElement("br", null), "final read."));
+}
+function SettingCardPassphrase({ passEnabled, setPassEnabled, passphrase, setPassphrase }) {
+  return /* @__PURE__ */ React.createElement("div", { style: {
     padding: 14,
     border: `1px solid ${passEnabled ? theme.accentLine : theme.border}`,
     borderRadius: 4,
@@ -1306,7 +1288,34 @@ function HeroSettings({ ttl, setTtl, maxDL, setMaxDL, passEnabled, setPassEnable
       }
     },
     "\u21BB regenerate"
-  ), /* @__PURE__ */ React.createElement("div", { style: { marginTop: 10, fontFamily: "var(--mono)", fontSize: 10, color: theme.inkDim, lineHeight: 1.7 } }, "argon2id wraps the key.", /* @__PURE__ */ React.createElement("br", null), "recipient enters this", /* @__PURE__ */ React.createElement("br", null), "(share separately)."))));
+  ), /* @__PURE__ */ React.createElement("div", { style: { marginTop: 10, fontFamily: "var(--mono)", fontSize: 10, color: theme.inkDim, lineHeight: 1.7 } }, "argon2id wraps the key.", /* @__PURE__ */ React.createElement("br", null), "recipient enters this", /* @__PURE__ */ React.createElement("br", null), "(share separately)."));
+}
+function HeroSettings({ ttl, setTtl, maxDL, setMaxDL, passEnabled, setPassEnabled, passphrase, setPassphrase, onClose, narrow = false }) {
+  return /* @__PURE__ */ React.createElement("div", { style: {
+    minHeight: 360,
+    borderRadius: 6,
+    border: `1px solid ${theme.borderHi}`,
+    background: theme.panel,
+    padding: narrow ? 16 : 22,
+    display: "flex",
+    flexDirection: "column",
+    gap: narrow ? 14 : 18
+  } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 } }, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "var(--mono)", fontSize: 10, color: theme.inkFaint, letterSpacing: "0.2em", textTransform: "uppercase" } }, "dispatch parameters"), /* @__PURE__ */ React.createElement("button", { onClick: onClose, style: {
+    padding: "6px 12px",
+    border: `1px solid ${theme.border}`,
+    background: theme.panelHi,
+    color: theme.inkDim,
+    fontFamily: "var(--mono)",
+    fontSize: 10,
+    letterSpacing: "0.18em",
+    textTransform: "uppercase",
+    borderRadius: 3,
+    cursor: "pointer"
+  } }, "\u2190 back")), /* @__PURE__ */ React.createElement("div", { style: {
+    display: "grid",
+    gridTemplateColumns: narrow ? "1fr" : "1fr 1fr 1fr",
+    gap: narrow ? 14 : 22
+  } }, /* @__PURE__ */ React.createElement(SettingCardTTL, { ttl, setTtl }), /* @__PURE__ */ React.createElement(SettingCardDownloads, { maxDL, setMaxDL }), /* @__PURE__ */ React.createElement(SettingCardPassphrase, { passEnabled, setPassEnabled, passphrase, setPassphrase })));
 }
 function CommandStrip({ screen, marketing = false }) {
   const cmd = {

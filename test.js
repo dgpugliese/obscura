@@ -1,0 +1,1 @@
+const theme = { border: "border", panelHi: "panelHi", inkFaint: "inkFaint", ink: "ink", accentLine: "accentLine", accentSoft: "accentSoft", accent: "accent", inkDim: "inkDim", borderHi: "borderHi", panel: "panel", panelLo: "panelLo" };
