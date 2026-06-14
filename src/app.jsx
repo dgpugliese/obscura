@@ -1247,14 +1247,22 @@ function HeroDone({ files, onReset, link, onDownload, mode, passphrase, onBurn, 
     setTimeout(() => setCopied(false), 1400);
   };
 
-  const qrSvg = useMemo(() => {
+  const qrData = useMemo(() => {
     if (!showQR || !link || typeof qrcode === "undefined") return null;
     try {
       const qr = qrcode(0, "M");
       qr.addData(link);
       qr.make();
-      // cellSize, margin, alt, title, scalable.
-      return qr.createSvgTag({ cellSize: 5, margin: 2, scalable: true });
+      const count = qr.getModuleCount();
+      const modules = [];
+      for (let r = 0; r < count; r++) {
+        for (let c = 0; c < count; c++) {
+          if (qr.isDark(r, c)) {
+            modules.push({ r, c });
+          }
+        }
+      }
+      return { count, modules };
     } catch (e) {
       console.error("qr generate failed", e);
       return null;
@@ -1341,7 +1349,7 @@ function HeroDone({ files, onReset, link, onDownload, mode, passphrase, onBurn, 
             borderRadius: 4, cursor: "pointer",
           }}>NEW</button>
         </div>
-        {showQR && qrSvg && (
+        {showQR && qrData && (
           <div style={{
             marginTop: 12, padding: 14,
             border: `1px solid ${theme.border}`,
@@ -1355,9 +1363,18 @@ function HeroDone({ files, onReset, link, onDownload, mode, passphrase, onBurn, 
               borderRadius: 3, display: "flex",
               alignItems: "center", justifyContent: "center",
               flex: "0 0 144px",
-            }}
-              dangerouslySetInnerHTML={{ __html: qrSvg.replace(/<svg/, '<svg style="width:100%;height:100%;display:block"') }}
-            />
+            }}>
+              <svg
+                style={{ width: "100%", height: "100%", display: "block" }}
+                viewBox={`0 0 ${qrData.count + 4} ${qrData.count + 4}`}
+                shapeRendering="crispEdges"
+              >
+                <path
+                  fill="#000"
+                  d={qrData.modules.map(m => `M${m.c + 2},${m.r + 2}h1v1h-1z`).join("")}
+                />
+              </svg>
+            </div>
             <div style={{ minWidth: 0 }}>
               <div style={{ fontFamily: "var(--mono)", fontSize: 10, color: theme.inkFaint, letterSpacing: "0.18em", textTransform: "uppercase" }}>scan to receive</div>
               <div style={{ fontFamily: "var(--mono)", fontSize: 11, color: theme.inkDim, marginTop: 6, lineHeight: 1.6 }}>
