@@ -62,16 +62,6 @@ function ScrambleTextAnimated({ value, speed, lockProgress, color, style, charse
   return <span style={{ color, fontVariantNumeric: "tabular-nums", ...style }}>{out}</span>;
 }
 
-function HexStream({ len = 32, speed = 60, style, color, paused = false }) {
-  const [s, setS] = useState(() => randHex(len));
-  useEffect(() => {
-    if (paused) return;
-    const id = setInterval(() => setS(randHex(len)), speed);
-    return () => clearInterval(id);
-  }, [len, speed, paused]);
-  return <span style={{ color, ...style }}>{s}</span>;
-}
-
 function HexDump({ rows = 6, cols = 16, speed = 80, color, dim, paused = false }) {
   const [seed, setSeed] = useState(0);
   useEffect(() => {

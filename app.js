@@ -48,15 +48,6 @@ function ScrambleTextAnimated({ value, speed, lockProgress, color, style, charse
   }, [value, lockProgress, speed, charset]);
   return /* @__PURE__ */ React.createElement("span", { style: { color, fontVariantNumeric: "tabular-nums", ...style } }, out);
 }
-function HexStream({ len = 32, speed = 60, style, color, paused = false }) {
-  const [s, setS] = useState(() => randHex(len));
-  useEffect(() => {
-    if (paused) return;
-    const id = setInterval(() => setS(randHex(len)), speed);
-    return () => clearInterval(id);
-  }, [len, speed, paused]);
-  return /* @__PURE__ */ React.createElement("span", { style: { color, ...style } }, s);
-}
 function HexDump({ rows = 6, cols = 16, speed = 80, color, dim, paused = false }) {
   const [seed, setSeed] = useState(0);
   useEffect(() => {
@@ -615,10 +606,10 @@ function hexLine(bytes) {
   }
   return s;
 }
-const BUILD_SHA = true ? "db4d96c" : "dev";
+const BUILD_SHA = true ? "7f4be5c" : "dev";
 const MARKETING_MODE = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("marketing") === "1";
-const BUILD_TIME = true ? "2026-05-12T03:29:41Z" : "";
-const BUILD_VERSION = true ? "v0.1.1" : "dev";
+const BUILD_TIME = true ? "2026-06-14T22:52:42Z" : "";
+const BUILD_VERSION = true ? "dev" : "dev";
 function useNarrow(threshold = 720) {
   const [narrow, setNarrow] = useState(() => typeof window !== "undefined" && window.innerWidth < threshold);
   useEffect(() => {
