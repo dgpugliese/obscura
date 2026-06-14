@@ -446,7 +446,7 @@ async function decryptBlob(blob, key) {
   return new Uint8Array(await crypto.subtle.decrypt({ name: "AES-GCM", iv }, key, ct));
 }
 
-function blobMagic(blob) {
+export function blobMagic(blob) {
   if (blob.length < 4) return null;
   for (let i = 0; i < 4; i++) {
     if (blob[i] === MAGIC[i]) continue;
