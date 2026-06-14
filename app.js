@@ -615,10 +615,10 @@ function hexLine(bytes) {
   }
   return s;
 }
-const BUILD_SHA = true ? "db4d96c" : "dev";
+const BUILD_SHA = true ? "7f4be5c" : "dev";
 const MARKETING_MODE = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("marketing") === "1";
-const BUILD_TIME = true ? "2026-05-12T03:29:41Z" : "";
-const BUILD_VERSION = true ? "v0.1.1" : "dev";
+const BUILD_TIME = true ? "2026-06-14T22:11:56Z" : "";
+const BUILD_VERSION = true ? "dev" : "dev";
 function useNarrow(threshold = 720) {
   const [narrow, setNarrow] = useState(() => typeof window !== "undefined" && window.innerWidth < threshold);
   useEffect(() => {
@@ -930,13 +930,19 @@ function HeroDone({ files, onReset, link, onDownload, mode, passphrase, onBurn, 
     setCopied(true);
     setTimeout(() => setCopied(false), 1400);
   };
-  const qrSvg = useMemo(() => {
+  const qrData = useMemo(() => {
     if (!showQR || !link || typeof qrcode === "undefined") return null;
     try {
       const qr = qrcode(0, "M");
       qr.addData(link);
       qr.make();
-      return qr.createSvgTag({ cellSize: 5, margin: 2, scalable: true });
+      const svgString = qr.createSvgTag({ cellSize: 5, margin: 2, scalable: true });
+      const viewBoxMatch = svgString.match(/viewBox="([^"]+)"/);
+      const pathMatch = svgString.match(/<path d="([^"]+)"/);
+      if (viewBoxMatch && pathMatch) {
+        return { viewBox: viewBoxMatch[1], pathData: pathMatch[1] };
+      }
+      return null;
     } catch (e) {
       console.error("qr generate failed", e);
       return null;
@@ -1032,7 +1038,7 @@ function HeroDone({ files, onReset, link, onDownload, mode, passphrase, onBurn, 
     textTransform: "uppercase",
     borderRadius: 4,
     cursor: "pointer"
-  } }, "NEW")), showQR && qrSvg && /* @__PURE__ */ React.createElement("div", { style: {
+  } }, "NEW")), showQR && qrData && /* @__PURE__ */ React.createElement("div", { style: {
     marginTop: 12,
     padding: 14,
     border: `1px solid ${theme.border}`,
@@ -1041,23 +1047,28 @@ function HeroDone({ files, onReset, link, onDownload, mode, passphrase, onBurn, 
     display: "flex",
     alignItems: "center",
     gap: 14
+  } }, /* @__PURE__ */ React.createElement("div", { style: {
+    width: 144,
+    height: 144,
+    background: "#fff",
+    padding: 6,
+    borderRadius: 3,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    flex: "0 0 144px"
   } }, /* @__PURE__ */ React.createElement(
-    "div",
+    "svg",
     {
-      style: {
-        width: 144,
-        height: 144,
-        background: "#fff",
-        padding: 6,
-        borderRadius: 3,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        flex: "0 0 144px"
-      },
-      dangerouslySetInnerHTML: { __html: qrSvg.replace(/<svg/, '<svg style="width:100%;height:100%;display:block"') }
-    }
-  ), /* @__PURE__ */ React.createElement("div", { style: { minWidth: 0 } }, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "var(--mono)", fontSize: 10, color: theme.inkFaint, letterSpacing: "0.18em", textTransform: "uppercase" } }, "scan to receive"), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "var(--mono)", fontSize: 11, color: theme.inkDim, marginTop: 6, lineHeight: 1.6 } }, "point the recipient's phone camera at this code.", /* @__PURE__ */ React.createElement("br", null), "fragment (", passphrase ? "id only \xB7 passphrase separately" : "key included", ") is encoded."))), passphrase && /* @__PURE__ */ React.createElement("div", { style: {
+      version: "1.1",
+      xmlns: "http://www.w3.org/2000/svg",
+      viewBox: qrData.viewBox,
+      preserveAspectRatio: "xMinYMin meet",
+      style: { width: "100%", height: "100%", display: "block" }
+    },
+    /* @__PURE__ */ React.createElement("rect", { width: "100%", height: "100%", fill: "white", cx: "0", cy: "0" }),
+    /* @__PURE__ */ React.createElement("path", { d: qrData.pathData, stroke: "transparent", fill: "black" })
+  )), /* @__PURE__ */ React.createElement("div", { style: { minWidth: 0 } }, /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "var(--mono)", fontSize: 10, color: theme.inkFaint, letterSpacing: "0.18em", textTransform: "uppercase" } }, "scan to receive"), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "var(--mono)", fontSize: 11, color: theme.inkDim, marginTop: 6, lineHeight: 1.6 } }, "point the recipient's phone camera at this code.", /* @__PURE__ */ React.createElement("br", null), "fragment (", passphrase ? "id only \xB7 passphrase separately" : "key included", ") is encoded."))), passphrase && /* @__PURE__ */ React.createElement("div", { style: {
     marginTop: 10,
     padding: "10px 12px",
     border: `1px solid ${theme.warn}`,
