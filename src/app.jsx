@@ -1247,14 +1247,20 @@ function HeroDone({ files, onReset, link, onDownload, mode, passphrase, onBurn, 
     setTimeout(() => setCopied(false), 1400);
   };
 
-  const qrSvg = useMemo(() => {
+  const qrData = useMemo(() => {
     if (!showQR || !link || typeof qrcode === "undefined") return null;
     try {
       const qr = qrcode(0, "M");
       qr.addData(link);
       qr.make();
       // cellSize, margin, alt, title, scalable.
-      return qr.createSvgTag({ cellSize: 5, margin: 2, scalable: true });
+      const svgString = qr.createSvgTag({ cellSize: 5, margin: 2, scalable: true });
+      const viewBoxMatch = svgString.match(/viewBox="([^"]+)"/);
+      const pathMatch = svgString.match(/<path d="([^"]+)"/);
+      if (viewBoxMatch && pathMatch) {
+        return { viewBox: viewBoxMatch[1], pathData: pathMatch[1] };
+      }
+      return null;
     } catch (e) {
       console.error("qr generate failed", e);
       return null;
@@ -1341,7 +1347,7 @@ function HeroDone({ files, onReset, link, onDownload, mode, passphrase, onBurn, 
             borderRadius: 4, cursor: "pointer",
           }}>NEW</button>
         </div>
-        {showQR && qrSvg && (
+        {showQR && qrData && (
           <div style={{
             marginTop: 12, padding: 14,
             border: `1px solid ${theme.border}`,
@@ -1355,9 +1361,18 @@ function HeroDone({ files, onReset, link, onDownload, mode, passphrase, onBurn, 
               borderRadius: 3, display: "flex",
               alignItems: "center", justifyContent: "center",
               flex: "0 0 144px",
-            }}
-              dangerouslySetInnerHTML={{ __html: qrSvg.replace(/<svg/, '<svg style="width:100%;height:100%;display:block"') }}
-            />
+            }}>
+              <svg
+                version="1.1"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox={qrData.viewBox}
+                preserveAspectRatio="xMinYMin meet"
+                style={{ width: "100%", height: "100%", display: "block" }}
+              >
+                <rect width="100%" height="100%" fill="white" cx="0" cy="0" />
+                <path d={qrData.pathData} stroke="transparent" fill="black" />
+              </svg>
+            </div>
             <div style={{ minWidth: 0 }}>
               <div style={{ fontFamily: "var(--mono)", fontSize: 10, color: theme.inkFaint, letterSpacing: "0.18em", textTransform: "uppercase" }}>scan to receive</div>
               <div style={{ fontFamily: "var(--mono)", fontSize: 11, color: theme.inkDim, marginTop: 6, lineHeight: 1.6 }}>
