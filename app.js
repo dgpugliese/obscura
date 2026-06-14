@@ -567,7 +567,7 @@ function fingerprintRows(hex) {
     `${pair(top, 6)}:${pair(top, 8)}:${pair(top, 10)}`
   ];
 }
-function shannonEntropy(bytes) {
+export function shannonEntropy(bytes) {
   if (!bytes || !bytes.length) return 0;
   const SAMPLE = 65536;
   let view = bytes;
@@ -615,10 +615,10 @@ function hexLine(bytes) {
   }
   return s;
 }
-const BUILD_SHA = true ? "db4d96c" : "dev";
+const BUILD_SHA = true ? "7f4be5c" : "dev";
 const MARKETING_MODE = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("marketing") === "1";
-const BUILD_TIME = true ? "2026-05-12T03:29:41Z" : "";
-const BUILD_VERSION = true ? "v0.1.1" : "dev";
+const BUILD_TIME = true ? "2026-06-14T22:58:12Z" : "";
+const BUILD_VERSION = true ? "dev" : "dev";
 function useNarrow(threshold = 720) {
   const [narrow, setNarrow] = useState(() => typeof window !== "undefined" && window.innerWidth < threshold);
   useEffect(() => {

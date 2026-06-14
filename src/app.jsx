@@ -538,7 +538,7 @@ function fingerprintRows(hex) {
 // a few thousandths of 8.0 — making the displayed number a real signal of
 // "the encryption produced ciphertext that looks uniform" instead of a
 // hardcoded 7.998.
-function shannonEntropy(bytes) {
+export function shannonEntropy(bytes) {
   if (!bytes || !bytes.length) return 0;
   // Sample at most 64 KiB so we don't stall the main thread on big payloads.
   const SAMPLE = 65536;

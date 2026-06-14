@@ -12,7 +12,14 @@
     "deploy": "wrangler deploy"
   },
   "devDependencies": {
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitest/coverage-v8": "^4.1.8",
     "esbuild": "^0.28.0",
+    "jsdom": "^29.1.1",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "vitest": "^4.1.8",
     "wrangler": "^4.90.0"
   }
 }
