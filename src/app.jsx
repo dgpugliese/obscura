@@ -1495,6 +1495,119 @@ function HeroCompose({ onSend, onClose }) {
   );
 }
 
+function SettingCardTTL({ ttl, setTtl }) {
+  return (
+    <div style={{
+      padding: 14,
+      border: `1px solid ${theme.border}`,
+      borderRadius: 4, background: theme.panelHi,
+    }}>
+      <div style={{ display: "flex", justifyContent: "space-between", fontFamily: "var(--mono)", fontSize: 9, color: theme.inkFaint, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 12 }}>
+        <span>ttl</span><span>01</span>
+      </div>
+      <div style={{ fontFamily: "var(--mono)", fontSize: 28, fontWeight: 700, color: theme.ink }}>{ttl}<span style={{ color: theme.inkFaint }}>h</span></div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 6, marginTop: 12 }}>
+        {[1, 2, 4, 8, 12, 24].map((n) => (
+          <button key={n} onClick={() => setTtl(n)} style={{
+            padding: "8px 0",
+            border: `1px solid ${ttl === n ? theme.accentLine : theme.border}`,
+            background: ttl === n ? theme.accentSoft : "transparent",
+            color: ttl === n ? theme.accent : theme.inkDim,
+            fontFamily: "var(--mono)", fontSize: 11,
+            borderRadius: 3, cursor: "pointer",
+          }}>{n}h</button>
+        ))}
+      </div>
+      <div style={{ marginTop: 12, fontFamily: "var(--mono)", fontSize: 10, color: theme.inkDim, lineHeight: 1.7 }}>
+        after which all ciphertext<br/>is unrecoverable.
+      </div>
+    </div>
+  );
+}
+
+function SettingCardDownloads({ maxDL, setMaxDL }) {
+  return (
+    <div style={{
+      padding: 14,
+      border: `1px solid ${theme.border}`,
+      borderRadius: 4, background: theme.panelHi,
+    }}>
+      <div style={{ display: "flex", justifyContent: "space-between", fontFamily: "var(--mono)", fontSize: 9, color: theme.inkFaint, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 12 }}>
+        <span>downloads</span><span>02</span>
+      </div>
+      <div style={{ fontFamily: "var(--mono)", fontSize: 28, fontWeight: 700, color: theme.ink }}>{maxDL}<span style={{ color: theme.inkFaint }}>x</span></div>
+      <div style={{ display: "flex", gap: 6, marginTop: 12 }}>
+        {[1, 3, 5, 10].map((n) => (
+          <button key={n} onClick={() => setMaxDL(n)} style={{
+            flex: 1, padding: "8px 0",
+            border: `1px solid ${maxDL === n ? theme.accentLine : theme.border}`,
+            background: maxDL === n ? theme.accentSoft : "transparent",
+            color: maxDL === n ? theme.accent : theme.inkDim,
+            fontFamily: "var(--mono)", fontSize: 11,
+            borderRadius: 3, cursor: "pointer",
+          }}>{n}x</button>
+        ))}
+      </div>
+      <div style={{ marginTop: 12, fontFamily: "var(--mono)", fontSize: 10, color: theme.inkDim, lineHeight: 1.7 }}>
+        link self-destructs after<br/>final read.
+      </div>
+    </div>
+  );
+}
+
+function SettingCardPassphrase({ passEnabled, setPassEnabled, passphrase, setPassphrase }) {
+  return (
+    <div style={{
+      padding: 14,
+      border: `1px solid ${passEnabled ? theme.accentLine : theme.border}`,
+      borderRadius: 4,
+      background: passEnabled ? theme.accentSoft : theme.panelHi,
+    }}>
+      <div style={{ display: "flex", justifyContent: "space-between", fontFamily: "var(--mono)", fontSize: 9, color: theme.inkFaint, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 12 }}>
+        <span>passphrase</span><span>03</span>
+      </div>
+      <button onClick={() => setPassEnabled(!passEnabled)} style={{
+        width: "100%", padding: "8px 0",
+        border: `1px solid ${passEnabled ? theme.accentLine : theme.border}`,
+        background: passEnabled ? theme.accentSoft : "transparent",
+        color: passEnabled ? theme.accent : theme.inkDim,
+        fontFamily: "var(--mono)", fontSize: 11,
+        letterSpacing: "0.18em", textTransform: "uppercase",
+        borderRadius: 3, cursor: "pointer", marginBottom: 10,
+      }}>
+        {passEnabled ? "● ENABLED" : "○ DISABLED"}
+      </button>
+      <input
+        value={passphrase}
+        onChange={(e) => setPassphrase(e.target.value)}
+        disabled={!passEnabled}
+        style={{
+          width: "100%", padding: "8px 10px",
+          border: `1px solid ${theme.borderHi}`, background: theme.panelLo,
+          color: theme.ink, fontFamily: "var(--mono)", fontSize: 12,
+          borderRadius: 3, outline: "none", boxSizing: "border-box",
+          opacity: passEnabled ? 1 : 0.4,
+        }}
+      />
+      <button onClick={() => setPassphrase(generatePassphrase())}
+        disabled={!passEnabled}
+        style={{
+          width: "100%", marginTop: 8, padding: "6px 0",
+          border: `1px solid ${theme.border}`, background: "transparent",
+          color: theme.inkDim, fontFamily: "var(--mono)", fontSize: 10,
+          letterSpacing: "0.18em", textTransform: "uppercase",
+          borderRadius: 3, cursor: passEnabled ? "pointer" : "not-allowed",
+          opacity: passEnabled ? 1 : 0.4,
+        }}>↻ regenerate</button>
+      <div style={{ marginTop: 10, fontFamily: "var(--mono)", fontSize: 10, color: theme.inkDim, lineHeight: 1.7 }}>
+        argon2id wraps the key.<br/>
+        recipient enters this<br/>
+        (share separately).
+      </div>
+    </div>
+  );
+}
+
 function HeroSettings({ ttl, setTtl, maxDL, setMaxDL, passEnabled, setPassEnabled, passphrase, setPassphrase, onClose, narrow = false }) {
   return (
     <div style={{
@@ -1525,106 +1638,9 @@ function HeroSettings({ ttl, setTtl, maxDL, setMaxDL, passEnabled, setPassEnable
         gridTemplateColumns: narrow ? "1fr" : "1fr 1fr 1fr",
         gap: narrow ? 14 : 22,
       }}>
-      <div style={{
-        padding: 14,
-        border: `1px solid ${theme.border}`,
-        borderRadius: 4, background: theme.panelHi,
-      }}>
-        <div style={{ display: "flex", justifyContent: "space-between", fontFamily: "var(--mono)", fontSize: 9, color: theme.inkFaint, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 12 }}>
-          <span>ttl</span><span>01</span>
-        </div>
-        <div style={{ fontFamily: "var(--mono)", fontSize: 28, fontWeight: 700, color: theme.ink }}>{ttl}<span style={{ color: theme.inkFaint }}>h</span></div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 6, marginTop: 12 }}>
-          {[1, 2, 4, 8, 12, 24].map((n) => (
-            <button key={n} onClick={() => setTtl(n)} style={{
-              padding: "8px 0",
-              border: `1px solid ${ttl === n ? theme.accentLine : theme.border}`,
-              background: ttl === n ? theme.accentSoft : "transparent",
-              color: ttl === n ? theme.accent : theme.inkDim,
-              fontFamily: "var(--mono)", fontSize: 11,
-              borderRadius: 3, cursor: "pointer",
-            }}>{n}h</button>
-          ))}
-        </div>
-        <div style={{ marginTop: 12, fontFamily: "var(--mono)", fontSize: 10, color: theme.inkDim, lineHeight: 1.7 }}>
-          after which all ciphertext<br/>is unrecoverable.
-        </div>
-      </div>
-
-      <div style={{
-        padding: 14,
-        border: `1px solid ${theme.border}`,
-        borderRadius: 4, background: theme.panelHi,
-      }}>
-        <div style={{ display: "flex", justifyContent: "space-between", fontFamily: "var(--mono)", fontSize: 9, color: theme.inkFaint, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 12 }}>
-          <span>downloads</span><span>02</span>
-        </div>
-        <div style={{ fontFamily: "var(--mono)", fontSize: 28, fontWeight: 700, color: theme.ink }}>{maxDL}<span style={{ color: theme.inkFaint }}>x</span></div>
-        <div style={{ display: "flex", gap: 6, marginTop: 12 }}>
-          {[1, 3, 5, 10].map((n) => (
-            <button key={n} onClick={() => setMaxDL(n)} style={{
-              flex: 1, padding: "8px 0",
-              border: `1px solid ${maxDL === n ? theme.accentLine : theme.border}`,
-              background: maxDL === n ? theme.accentSoft : "transparent",
-              color: maxDL === n ? theme.accent : theme.inkDim,
-              fontFamily: "var(--mono)", fontSize: 11,
-              borderRadius: 3, cursor: "pointer",
-            }}>{n}x</button>
-          ))}
-        </div>
-        <div style={{ marginTop: 12, fontFamily: "var(--mono)", fontSize: 10, color: theme.inkDim, lineHeight: 1.7 }}>
-          link self-destructs after<br/>final read.
-        </div>
-      </div>
-
-      <div style={{
-        padding: 14,
-        border: `1px solid ${passEnabled ? theme.accentLine : theme.border}`,
-        borderRadius: 4,
-        background: passEnabled ? theme.accentSoft : theme.panelHi,
-      }}>
-        <div style={{ display: "flex", justifyContent: "space-between", fontFamily: "var(--mono)", fontSize: 9, color: theme.inkFaint, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 12 }}>
-          <span>passphrase</span><span>03</span>
-        </div>
-        <button onClick={() => setPassEnabled(!passEnabled)} style={{
-          width: "100%", padding: "8px 0",
-          border: `1px solid ${passEnabled ? theme.accentLine : theme.border}`,
-          background: passEnabled ? theme.accentSoft : "transparent",
-          color: passEnabled ? theme.accent : theme.inkDim,
-          fontFamily: "var(--mono)", fontSize: 11,
-          letterSpacing: "0.18em", textTransform: "uppercase",
-          borderRadius: 3, cursor: "pointer", marginBottom: 10,
-        }}>
-          {passEnabled ? "● ENABLED" : "○ DISABLED"}
-        </button>
-        <input
-          value={passphrase}
-          onChange={(e) => setPassphrase(e.target.value)}
-          disabled={!passEnabled}
-          style={{
-            width: "100%", padding: "8px 10px",
-            border: `1px solid ${theme.borderHi}`, background: theme.panelLo,
-            color: theme.ink, fontFamily: "var(--mono)", fontSize: 12,
-            borderRadius: 3, outline: "none", boxSizing: "border-box",
-            opacity: passEnabled ? 1 : 0.4,
-          }}
-        />
-        <button onClick={() => setPassphrase(generatePassphrase())}
-          disabled={!passEnabled}
-          style={{
-            width: "100%", marginTop: 8, padding: "6px 0",
-            border: `1px solid ${theme.border}`, background: "transparent",
-            color: theme.inkDim, fontFamily: "var(--mono)", fontSize: 10,
-            letterSpacing: "0.18em", textTransform: "uppercase",
-            borderRadius: 3, cursor: passEnabled ? "pointer" : "not-allowed",
-            opacity: passEnabled ? 1 : 0.4,
-          }}>↻ regenerate</button>
-        <div style={{ marginTop: 10, fontFamily: "var(--mono)", fontSize: 10, color: theme.inkDim, lineHeight: 1.7 }}>
-          argon2id wraps the key.<br/>
-          recipient enters this<br/>
-          (share separately).
-        </div>
-      </div>
+        <SettingCardTTL ttl={ttl} setTtl={setTtl} />
+        <SettingCardDownloads maxDL={maxDL} setMaxDL={setMaxDL} />
+        <SettingCardPassphrase passEnabled={passEnabled} setPassEnabled={setPassEnabled} passphrase={passphrase} setPassphrase={setPassphrase} />
       </div>
     </div>
   );
