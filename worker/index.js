@@ -300,12 +300,16 @@ async function sweepOrphans(env) {
   // succeeded but META delete didn't. List a page and check each.
   let cursor;
   let scanned = 0;
+  const BATCH_SIZE = 50;
   do {
     const page = await env.BLOBS.list({ limit: 200, cursor });
-    for (const obj of page.objects) {
-      scanned++;
-      const meta = await env.META.get(obj.key);
-      if (!meta) await env.BLOBS.delete(obj.key);
+    for (let i = 0; i < page.objects.length; i += BATCH_SIZE) {
+      const batch = page.objects.slice(i, i + BATCH_SIZE);
+      await Promise.all(batch.map(async (obj) => {
+        scanned++;
+        const meta = await env.META.get(obj.key);
+        if (!meta) await env.BLOBS.delete(obj.key);
+      }));
     }
     cursor = page.truncated ? page.cursor : undefined;
   } while (cursor && scanned < 2000); // safety cap per run
