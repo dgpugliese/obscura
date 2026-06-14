@@ -400,7 +400,7 @@ const PASSPHRASE_WORDS = [
   "zephyr",
   "zinc"
 ];
-function secureRandInt(max) {
+export function secureRandInt(max) {
   if (max <= 0 || max > 4294967296) throw new Error("secureRandInt out of range");
   const limit = Math.floor(4294967296 / max) * max;
   const buf = new Uint32Array(1);
@@ -615,10 +615,10 @@ function hexLine(bytes) {
   }
   return s;
 }
-const BUILD_SHA = true ? "db4d96c" : "dev";
+const BUILD_SHA = true ? "7f4be5c" : "dev";
 const MARKETING_MODE = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("marketing") === "1";
-const BUILD_TIME = true ? "2026-05-12T03:29:41Z" : "";
-const BUILD_VERSION = true ? "v0.1.1" : "dev";
+const BUILD_TIME = true ? "2026-06-14T23:05:31Z" : "";
+const BUILD_VERSION = true ? "dev" : "dev";
 function useNarrow(threshold = 720) {
   const [narrow, setNarrow] = useState(() => typeof window !== "undefined" && window.innerWidth < threshold);
   useEffect(() => {
@@ -2039,4 +2039,6 @@ function Entry() {
   }
   return /* @__PURE__ */ React.createElement(App, null);
 }
-ReactDOM.createRoot(document.getElementById("root")).render(/* @__PURE__ */ React.createElement(Entry, null));
+if (typeof process === "undefined" || true) {
+  ReactDOM.createRoot(document.getElementById("root")).render(/* @__PURE__ */ React.createElement(Entry, null));
+}

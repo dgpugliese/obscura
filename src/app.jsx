@@ -353,7 +353,7 @@ const PASSPHRASE_WORDS = [
 // Unbiased uniform integer in [0, max) backed by crypto.getRandomValues.
 // Math.random is not a CSPRNG; using it for passphrase material would let an
 // attacker who learns one passphrase predict future ones from V8 RNG state.
-function secureRandInt(max) {
+export function secureRandInt(max) {
   if (max <= 0 || max > 0x100000000) throw new Error("secureRandInt out of range");
   const limit = Math.floor(0x100000000 / max) * max;
   const buf = new Uint32Array(1);
@@ -2479,4 +2479,7 @@ function Entry() {
   return <App />;
 }
 
-ReactDOM.createRoot(document.getElementById("root")).render(<Entry />);
+// Only render if we're not in a test environment to avoid executing side effects
+if (typeof process === "undefined" || process.env.NODE_ENV !== "test") {
+  ReactDOM.createRoot(document.getElementById("root")).render(<Entry />);
+}
