@@ -615,10 +615,10 @@ function hexLine(bytes) {
   }
   return s;
 }
-const BUILD_SHA = true ? "db4d96c" : "dev";
+const BUILD_SHA = true ? "7f4be5c" : "dev";
 const MARKETING_MODE = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("marketing") === "1";
-const BUILD_TIME = true ? "2026-05-12T03:29:41Z" : "";
-const BUILD_VERSION = true ? "v0.1.1" : "dev";
+const BUILD_TIME = true ? "2026-06-14T22:05:27Z" : "";
+const BUILD_VERSION = true ? "dev" : "dev";
 function useNarrow(threshold = 720) {
   const [narrow, setNarrow] = useState(() => typeof window !== "undefined" && window.innerWidth < threshold);
   useEffect(() => {
@@ -1482,14 +1482,14 @@ function App() {
   }, [ttl, maxDL, passEnabled, passphrase]);
   useEffect(() => {
     const onEnter = (e) => {
-      if (e.dataTransfer && Array.from(e.dataTransfer.types || []).includes("Files")) {
+      if (e.dataTransfer && Array.prototype.includes.call(e.dataTransfer.types || [], "Files")) {
         e.preventDefault();
         dragDepth.current += 1;
         setScreen((s) => s === "empty" ? "drag" : s);
       }
     };
     const onOver = (e) => {
-      if (e.dataTransfer && Array.from(e.dataTransfer.types || []).includes("Files")) {
+      if (e.dataTransfer && Array.prototype.includes.call(e.dataTransfer.types || [], "Files")) {
         e.preventDefault();
       }
     };
@@ -1905,13 +1905,13 @@ function DecryptApp({ keyBytes, id, passphraseMode }) {
   }, [id, onBlob]);
   useEffect(() => {
     const onEnter = (e) => {
-      if (e.dataTransfer && Array.from(e.dataTransfer.types || []).includes("Files")) {
+      if (e.dataTransfer && Array.prototype.includes.call(e.dataTransfer.types || [], "Files")) {
         e.preventDefault();
         dragDepth.current += 1;
       }
     };
     const onOver = (e) => {
-      if (e.dataTransfer && Array.from(e.dataTransfer.types || []).includes("Files")) e.preventDefault();
+      if (e.dataTransfer && Array.prototype.includes.call(e.dataTransfer.types || [], "Files")) e.preventDefault();
     };
     const onLeave = () => {
       dragDepth.current = Math.max(0, dragDepth.current - 1);
