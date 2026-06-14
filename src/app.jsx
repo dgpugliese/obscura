@@ -31,7 +31,9 @@ const CIPHER_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789#$%&*+=<>/\\|".split("");
 
 function randHex(len = 4) {
   let s = "";
-  for (let i = 0; i < len; i++) s += HEX[Math.floor(Math.random() * 16)];
+  const buf = new Uint8Array(len);
+  crypto.getRandomValues(buf);
+  for (let i = 0; i < len; i++) s += HEX[buf[i] % 16];
   return s;
 }
 
