@@ -29,7 +29,7 @@ const CSP = [
   "object-src 'none'",
 ].join("; ");
 
-const SECURITY_HEADERS = {
+export const SECURITY_HEADERS = {
   "content-security-policy": CSP,
   "referrer-policy": "no-referrer",
   "x-content-type-options": "nosniff",
@@ -38,7 +38,7 @@ const SECURITY_HEADERS = {
   "strict-transport-security": "max-age=31536000; includeSubDomains",
 };
 
-function withSecurityHeaders(res) {
+export function withSecurityHeaders(res) {
   const h = new Headers(res.headers);
   for (const [k, v] of Object.entries(SECURITY_HEADERS)) h.set(k, v);
   return new Response(res.body, { status: res.status, statusText: res.statusText, headers: h });
