@@ -397,7 +397,7 @@ function clampInt(raw, min, max, fallback) {
   return Math.max(min, Math.min(max, n));
 }
 
-function randomHexId(bytes) {
+export function randomHexId(bytes) {
   const buf = new Uint8Array(bytes);
   crypto.getRandomValues(buf);
   let s = "";
