@@ -88,21 +88,21 @@
   .metric.created .val { color: var(--accent); }
   .metric.burned .val { color: var(--warn); }
   .metric.expired .val { color: var(--ink-dim); }
-  .bars { display: grid; grid-template-columns: repeat(30, 1fr); gap: 3px; align-items: end; height: 90px; padding: 6px 0; }
+  .bars { display: grid; grid-template-columns: repeat(90, minmax(3px, 1fr)); gap: 2px; align-items: end; height: 90px; padding: 6px 0; }
   .bars .bar { background: var(--accent); opacity: 0.85; min-height: 1px; border-radius: 1px; }
   .bars .bar.empty { background: var(--border); opacity: 0.5; }
+  .activity-strip { display: grid; grid-template-columns: repeat(90, minmax(3px, 1fr)); gap: 2px; margin-top: 8px; }
+  .activity-day { aspect-ratio: 1 / 2.2; min-height: 20px; border-radius: 2px; background: var(--border); opacity: 0.45; }
+  .activity-day.created { background: var(--accent); opacity: 0.82; }
+  .activity-day.burned { background: var(--warn); opacity: 0.9; }
+  .activity-day.expired { background: var(--ink-dim); opacity: 0.9; }
+  .activity-day.exhausted { background: var(--crit); opacity: 0.95; }
   .calendar { display: grid; grid-template-columns: repeat(30, 1fr); gap: 3px; margin-top: 10px; }
   .day { aspect-ratio: 1 / 2.5; min-height: 28px; border-radius: 2px; background: var(--secure); opacity: 0.7; cursor: default; }
   .day.warn { background: var(--warn); opacity: 1; }
   .day.crit { background: var(--crit); opacity: 1; }
   .legend { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 12px; font-size: 10px; color: var(--ink-dim); letter-spacing: 0.08em; text-transform: uppercase; }
   .legend .sw { display: inline-block; width: 10px; height: 10px; margin-right: 6px; vertical-align: middle; border-radius: 2px; }
-  table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 12px; }
-  th, td { padding: 7px 8px; text-align: right; border-bottom: 1px solid var(--border); vertical-align: top; }
-  th:first-child, td:first-child { text-align: left; color: var(--ink-dim); }
-  th { font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-faint); font-weight: 500; }
-  td { color: var(--ink); }
-  td.zero { color: var(--ink-faint); }
   h2 { margin: 18px 0 8px; font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink); font-weight: 600; }
   h2:first-child { margin-top: 0; }
   p { margin: 8px 0; color: var(--ink-dim); }
@@ -133,12 +133,8 @@
     .hero, .grid-4, .grid-3, .grid-2 { grid-template-columns: 1fr; }
     h1 { font-size: 22px; line-height: 1.35; }
     .hero-main { min-height: 0; padding: 18px; }
-    .bars, .calendar { grid-template-columns: repeat(15, 1fr); }
-    table, thead, tbody, tr, td, th { display: block; }
-    th { display: none; }
-    td { border-bottom: none; padding: 4px 0; text-align: left; }
-    tr { padding: 10px 0; border-bottom: 1px solid var(--border); }
-    td:first-child { font-weight: 600; margin-bottom: 4px; }
+    .bars, .activity-strip { grid-template-columns: repeat(45, minmax(3px, 1fr)); }
+    .calendar { grid-template-columns: repeat(15, 1fr); }
   }
   @media (max-width: 400px) {
     .brand { font-size: 13px; letter-spacing: 0.26em; }
@@ -217,11 +213,16 @@
         <div class="eyebrow">shares created · daily retained window <span id="peakDay" style="float:right;color:var(--ink-dim);">-</span></div>
         <div class="bars" id="bars"></div>
       </div>
-      <div style="overflow-x: auto;">
-        <table id="table">
-          <thead><tr><th>date (UTC)</th><th>created</th><th>burned</th><th>expired</th><th>exhausted</th></tr></thead>
-          <tbody></tbody>
-        </table>
+      <div style="margin-top: 12px;">
+        <div class="eyebrow">retained counter days <span id="activitySummary" style="float:right;color:var(--ink-dim);">-</span></div>
+        <div class="activity-strip" id="activityStrip" aria-label="Retained daily transparency activity"></div>
+        <div class="legend">
+          <span><span class="sw" style="background: var(--border)"></span>none</span>
+          <span><span class="sw" style="background: var(--accent)"></span>created</span>
+          <span><span class="sw" style="background: var(--warn)"></span>burned</span>
+          <span><span class="sw" style="background: var(--ink-dim)"></span>expired</span>
+          <span><span class="sw" style="background: var(--crit)"></span>exhausted</span>
+        </div>
       </div>
       <div class="grid-2" style="margin-top: 16px;">
         <div class="stat-card"><div class="lbl">abuse reports</div><div class="val" id="abuseReceived">-</div><div class="sub">received, cumulative</div></div>

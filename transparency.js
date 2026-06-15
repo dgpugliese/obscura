@@ -41,24 +41,26 @@
   document.getElementById("peakDay").textContent =
     peak.count > 0 ? "peak " + peak.count + " on " + peak.date : "no activity";
 
-  const tbody = document.querySelector("#table tbody");
-  for (const d of days.slice().reverse()) {
-    const tr = document.createElement("tr");
-    const cells = [
-      { text: d.date, zero: false },
-      { text: String(d.created || 0), zero: !d.created },
-      { text: String(d.burned || 0), zero: !d.burned },
-      { text: String(d.expired || 0), zero: !d.expired },
-      { text: String(d.exhausted || 0), zero: !d.exhausted },
-    ];
-    for (const c of cells) {
-      const td = document.createElement("td");
-      if (c.zero) td.className = "zero";
-      td.textContent = c.text;
-      tr.appendChild(td);
-    }
-    tbody.appendChild(tr);
+  const strip = document.getElementById("activityStrip");
+  let activeDays = 0;
+  for (const d of days) {
+    const created = d.created || 0;
+    const burned = d.burned || 0;
+    const expired = d.expired || 0;
+    const exhausted = d.exhausted || 0;
+    const total = created + burned + expired + exhausted;
+    const day = document.createElement("div");
+    day.className = "activity-day";
+    if (exhausted) day.classList.add("exhausted");
+    else if (expired) day.classList.add("expired");
+    else if (burned) day.classList.add("burned");
+    else if (created) day.classList.add("created");
+    if (total > 0) activeDays += 1;
+    day.title = `${d.date} · ${created} created · ${burned} burned · ${expired} expired · ${exhausted} exhausted`;
+    strip.appendChild(day);
   }
+  document.getElementById("activitySummary").textContent =
+    activeDays > 0 ? `${activeDays} active days / ${days.length}` : `0 active days / ${days.length}`;
 
   document.getElementById("abuseReceived").textContent = (data.abuse && data.abuse.received) || 0;
   document.getElementById("abuseActioned").textContent = (data.abuse && data.abuse.actioned) || 0;
