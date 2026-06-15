@@ -2,7 +2,7 @@
 
 > **Zero-knowledge ephemeral file transfer.** Encrypt in the browser, ship the ciphertext, burn the link.
 
-🔗 **Live:** [obscr.app](https://obscr.app) &nbsp;·&nbsp; 🚀 [app](https://obscr.app/app) &nbsp;·&nbsp; 📊 [transparency](https://obscr.app/transparency) &nbsp;·&nbsp; 🟢 [status](https://obscr.app/status) &nbsp;·&nbsp; 🔒 [privacy](https://obscr.app/privacy) &nbsp;·&nbsp; ☕ [support](https://obscr.app/support)
+🔗 **Live:** [obscr.app](https://obscr.app) &nbsp;·&nbsp; 🚀 [app](https://obscr.app/app) &nbsp;·&nbsp; 🛡️ [trust center](https://obscr.app/transparency.html) &nbsp;·&nbsp; ☕ [support](https://obscr.app/transparency.html#support)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Deployed on Cloudflare](https://img.shields.io/badge/edge-Cloudflare%20Workers-f38020)](https://workers.cloudflare.com/)
@@ -41,7 +41,7 @@ key stays in #fragment          metadata in KV (TTL)              decrypt with #
 - 🔥 **Burn-after-read** — TTL (1h–7d) and download count (1/3/5/10×), enforced server-side
 - 💣 **Manual burn** — sender can nuke a share instantly from the Done screen
 - 📱 **QR code** for fast mobile handoff
-- 🎨 **Three layouts** — centered, sidebar, terminal
+- 🧭 **Single focused app view** — one sender/recipient workspace instead of layout modes
 - ⌨️ **Three inputs** — drag-and-drop, file picker (⌘+O), paste (⌘+V), compose textarea
 - 📐 **Mobile-responsive** down to 360px
 
@@ -126,7 +126,7 @@ Paste the returned IDs into [`wrangler.toml`](wrangler.toml).
 
 ## Abuse / takedown
 
-Anonymous file hosting attracts misuse. Report illegal content to **[abuse@obscr.app](mailto:abuse@obscr.app)** with the share URL. The server has no decrypted content, so removal = purging the ciphertext blob (which any sender can also do themselves via "burn now" on the Done screen). Aggregate report counts are published on the [transparency page](https://obscr.app/transparency).
+Anonymous file hosting attracts misuse. Report illegal content to **[abuse@obscr.app](mailto:abuse@obscr.app)** with the share URL. The server has no decrypted content, so removal = purging the ciphertext blob (which any sender can also do themselves via "burn now" on the Done screen). Aggregate report counts are published in the [Trust Center](https://obscr.app/transparency.html).
 
 ## Support
 
@@ -134,7 +134,7 @@ OBSCURA is free, open source, and ad-free. It's hosted on Cloudflare and the bil
 
 <a href="https://www.buymeacoffee.com/dgpugliese" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" height="50" width="210"></a>
 
-Donations are always optional and nothing in the app is gated behind a tip. More at [obscr.app/support](https://obscr.app/support).
+Donations are always optional and nothing in the app is gated behind a tip. More in the [Trust Center support section](https://obscr.app/transparency.html#support).
 
 ---
 

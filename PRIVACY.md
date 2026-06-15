@@ -73,7 +73,7 @@ If you need stronger anonymity than this, route through Tor or a VPN before uplo
 
 ## Abuse reports
 
-Email **abuse@obscr.app** with the share URL and a brief description. We do not store decrypted content, so abuse handling consists of purging the ciphertext blob (which any sender can also do themselves from the Done screen via "burn now") and counting the report in the public transparency log.
+Email **abuse@obscr.app** with the share URL and a brief description. We do not store decrypted content, so abuse handling consists of purging the ciphertext blob (which any sender can also do themselves from the Done screen via "burn now") and counting the report in the public Trust Center.
 
 We log received and actioned counts, not report contents.
 
