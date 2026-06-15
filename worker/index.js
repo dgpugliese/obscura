@@ -342,7 +342,7 @@ async function bumpStat(env, event) {
 }
 
 async function handleTransparency(env) {
-  const days = 30;
+  const days = 90;
   const today = new Date();
   const dateKeys = [];
   for (let i = days - 1; i >= 0; i--) {
@@ -380,7 +380,7 @@ async function handleTransparency(env) {
     {
       generatedAt: Date.now(),
       windowDays: days,
-      note: "Aggregate daily counts. No per-share data, no IPs, no identifiers. Best-effort: simultaneous events in the same second may undercount by one.",
+      note: "Aggregate daily counts for the retained KV window. No per-share data, no IPs, no identifiers. Best-effort: simultaneous events in the same second may undercount by one.",
       events: {
         created: "share uploaded",
         burned: "manually purged by sender",

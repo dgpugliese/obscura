@@ -214,7 +214,7 @@
         <div class="metric exhausted"><div class="lbl">exhausted</div><div class="val" id="t-exhausted">-</div><div class="sub">downloads consumed</div></div>
       </div>
       <div style="margin-top: 16px;">
-        <div class="eyebrow">shares created · daily <span id="peakDay" style="float:right;color:var(--ink-dim);">-</span></div>
+        <div class="eyebrow">shares created · daily retained window <span id="peakDay" style="float:right;color:var(--ink-dim);">-</span></div>
         <div class="bars" id="bars"></div>
       </div>
       <div style="overflow-x: auto;">
@@ -228,7 +228,7 @@
         <div class="stat-card"><div class="lbl">abuse actioned</div><div class="val" id="abuseActioned">-</div><div class="sub">purges or responses, cumulative</div></div>
       </div>
       <div class="note">
-        Counters are daily KV keys with 90-day TTL. They carry no per-share data, no IPs, and no identifiers. Raw JSON: <a href="/api/transparency">/api/transparency</a>.
+        The report shows every retained daily counter, up to 90 days. Counters are daily KV keys with 90-day TTL. They carry no per-share data, no IPs, and no identifiers. Raw JSON: <a href="/api/transparency">/api/transparency</a>.
       </div>
     </div>
   </section>
