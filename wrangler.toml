@@ -39,4 +39,4 @@ crons = ["0 * * * *"]
 [vars]
 MAX_BLOB_BYTES = "67108864"  # 64 MiB hard ceiling; design max is 50 MB
 MAX_TTL_HOURS = "168"        # 7 days
-MAX_DOWNLOADS = "100"
+MAX_DOWNLOADS = "10"

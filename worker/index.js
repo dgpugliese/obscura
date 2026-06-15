@@ -56,10 +56,15 @@ const PROD_ALLOWED_ORIGINS = new Set([
 
 function originAllowed(request) {
   const origin = request.headers.get("origin");
-  if (!origin) return false;
+  const requestUrl = new URL(request.url);
+  if (!origin) {
+    const fetchSite = request.headers.get("sec-fetch-site");
+    return fetchSite === "same-origin" || fetchSite === "none";
+  }
   if (PROD_ALLOWED_ORIGINS.has(origin)) return true;
   try {
     const u = new URL(origin);
+    if (u.origin === requestUrl.origin) return true;
     if ((u.hostname === "localhost" || u.hostname === "127.0.0.1") && u.protocol === "http:") {
       return true;
     }
@@ -150,7 +155,7 @@ async function handleUpload(request, env, ctx) {
   if (!originAllowed(request)) return jerr(403, "forbidden origin");
 
   const ttl = clampInt(request.headers.get("X-Obscura-TTL"), 1, parseInt(env.MAX_TTL_HOURS, 10) || 168, 24);
-  const maxDL = clampInt(request.headers.get("X-Obscura-MaxDL"), 1, parseInt(env.MAX_DOWNLOADS, 10) || 100, 1);
+  const maxDL = allowedInt(request.headers.get("X-Obscura-MaxDL"), [1, 3, 5, 10], 1);
   const maxBytes = parseInt(env.MAX_BLOB_BYTES, 10) || 50 * 1024 * 1024;
 
   const body = await request.arrayBuffer();
@@ -395,6 +400,11 @@ function clampInt(raw, min, max, fallback) {
   const n = parseInt(raw, 10);
   if (!Number.isFinite(n)) return fallback;
   return Math.max(min, Math.min(max, n));
+}
+
+function allowedInt(raw, allowed, fallback) {
+  const n = parseInt(raw, 10);
+  return allowed.includes(n) ? n : fallback;
 }
 
 function randomHexId(bytes) {

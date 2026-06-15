@@ -6,11 +6,12 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Deployed on Cloudflare](https://img.shields.io/badge/edge-Cloudflare%20Workers-f38020)](https://workers.cloudflare.com/)
+[![Security policy](https://img.shields.io/badge/security-policy-6ee7b7)](SECURITY.md)
 [![Built with Claude Code](https://img.shields.io/badge/built%20with-Claude%20Code-d97757)](https://claude.com/claude-code)
 
 OBSCURA encrypts your files in the browser with **AES-256-GCM** before they leave the page. The server only ever sees ciphertext — keys live in the URL fragment (which browsers never send to servers) or are wrapped under an Argon2id-derived passphrase you share out of band. Shares self-destruct after a configurable TTL or download count.
 
-> ⚠ **Use it for what it's good at, not what it isn't.** OBSCURA is provided **AS IS** under [MIT](LICENSE), has **not been independently security-audited**, and is **not appropriate for regulated data** (HIPAA / PCI / CJIS / classified). No SLA, no key recovery, no warranty. See [DISCLAIMER.md](DISCLAIMER.md) and [PRIVACY.md](PRIVACY.md) before trusting it with anything that matters.
+> ⚠ **Use it for what it's good at, not what it isn't.** OBSCURA is provided **AS IS** under [MIT](LICENSE), has **not been independently security-audited**, and is **not appropriate for regulated data** (HIPAA / PCI / CJIS / classified). No SLA, no key recovery, no warranty. See [DISCLAIMER.md](DISCLAIMER.md), [PRIVACY.md](PRIVACY.md), and [SECURITY.md](SECURITY.md) before trusting it with anything that matters.
 
 ---
 
@@ -44,6 +45,17 @@ key stays in #fragment          metadata in KV (TTL)              decrypt with #
 - ⌨️ **Three inputs** — drag-and-drop, file picker (⌘+O), paste (⌘+V), compose textarea
 - 📐 **Mobile-responsive** down to 360px
 
+## Current public limits
+
+| Limit | Current value | Notes |
+| --- | --- | --- |
+| File size | 50 MB design ceiling, 64 MiB hard server cap | Current Worker buffers each upload; larger paid tiers need chunked/direct R2 upload first. |
+| Expiry | 1 hour to 7 days | Enforced by Worker metadata TTL and orphan cleanup. |
+| Download count | 1, 3, 5, or 10 | These are the visible public UI choices. |
+| Accounts | None | No identity, email, or user profile is required to create a share. |
+| Security audit | Not independently audited | Standard primitives, public source, no formal third-party audit. |
+| Regulated data | Not supported | No HIPAA, PCI, CJIS, classified, or BAA/SLA posture. |
+
 ## Stack
 
 | Layer    | Tech |
@@ -61,7 +73,15 @@ npm install
 npm run dev      # builds src/app.jsx → app.js, runs wrangler on :8787
 ```
 
-JSX source is in [`src/app.jsx`](src/app.jsx). `npm run build` produces [`app.js`](app.js) at the repo root, loaded by [`app.html`](app.html) (the React shell served at `/app`). The marketing/landing page lives at [`index.html`](index.html) (served at `/`). The static pages — [`transparency.html`](transparency.html), [`status.html`](status.html), [`privacy.html`](privacy.html), [`support.html`](support.html), [`404.html`](404.html) — and [`_headers`](_headers), [`favicon.svg`](favicon.svg), `app.js` are served by the assets binding. Everything else is the worker.
+JSX source is in [`src/app.jsx`](src/app.jsx). `npm run build` produces [`app.js`](app.js) at the repo root, loaded by [`app.html`](app.html) (the React shell served at `/app`). The marketing/landing page lives at [`index.html`](index.html) (served at `/`). The Trust Center lives at [`transparency.html`](transparency.html); [`status.html`](status.html), [`privacy.html`](privacy.html), and [`support.html`](support.html) redirect to its matching sections for old links. Static assets including [`404.html`](404.html), [`_headers`](_headers), [`favicon.svg`](favicon.svg), and `app.js` are served by the assets binding. Everything else is the worker.
+
+### Docker local dev
+
+```bash
+docker compose up --build
+```
+
+Open <http://localhost:8787> for the app and <http://localhost:8025> for Mailpit. Mailpit exposes SMTP on `mailpit:1025` inside Docker and `localhost:1025` on the host. OBSCURA does not send application email today, but the compose stack reserves the local SMTP target for future abuse, support, waitlist, or paid-tier email flows without touching production mail.
 
 ### Deploy
 
@@ -102,6 +122,7 @@ Paste the returned IDs into [`wrangler.toml`](wrangler.toml).
 - `/api/upload` requires a same-origin `Origin` header, sanity-checks the OBS1/OBS2 magic, and enforces minimum ciphertext lengths — the bucket can't be used as anonymous object storage.
 - Auto-generated passphrases come from `crypto.getRandomValues` via rejection sampling. Never `Math.random`. Roll your own passphrase if you want more than convenience-grade entropy.
 - Cloudflare logs request paths and IPs by default. `/api/d/{id}` contains the share ID, so an operator with log access *could* correlate IPs to shares. The full data policy is in [PRIVACY.md](PRIVACY.md). For stronger anonymity, route through Tor or a VPN.
+- Vulnerability reports go to **security@obscr.app**. Scope and response expectations are documented in [SECURITY.md](SECURITY.md).
 
 ## Abuse / takedown
 

@@ -1,10 +1,10 @@
 # Privacy & Logs Policy
 
-**Last updated:** 2026-05-05
+**Last updated:** 2026-06-14
 
 OBSCURA is a zero-knowledge file-transfer service. The point of this document is to be specific about what that means in practice — what we store, what we *can't* store, what our infrastructure provider stores on our behalf, and how long any of it lasts.
 
-If something here is wrong or out of date, that's a bug. Open an issue at <https://github.com/dgpugliese/Obsecura/issues> or email **security@obscr.app**.
+If something here is wrong or out of date, that's a bug. Open an issue at <https://github.com/dgpugliese/obscura/issues> or email **security@obscr.app**. Vulnerability reporting scope lives in [SECURITY.md](SECURITY.md).
 
 ---
 
@@ -18,7 +18,7 @@ If something here is wrong or out of date, that's a bug. Open an issue at <https
   - `downloads` — remaining download count
   - `size` — ciphertext size in bytes
   - `createdAt` — unix milliseconds
-- **Aggregate counters** (added 2026-05-05). Daily totals of shares created, burned, expired, and exhausted. Stored in KV under `stat:YYYY-MM-DD:<event>` keys with a 90-day TTL. **No per-share data, no IPs, no identifiers.** These power the public [transparency report](https://obscr.app/transparency.html).
+- **Aggregate counters** (added 2026-05-05). Daily totals of shares created, burned, expired, and exhausted. Stored in KV under `stat:YYYY-MM-DD:<event>` keys with a 90-day TTL. **No per-share data, no IPs, no identifiers.** These power the public [Trust Center](https://obscr.app/transparency.html).
 
 ### What the application code does **not** store
 
@@ -67,7 +67,7 @@ If you need stronger anonymity than this, route through Tor or a VPN before uplo
 - **The operator** (David Pugliese, via the Cloudflare account): can see ciphertext bytes (opaque), KV metadata, aggregate counters, and Cloudflare-side analytics/logs as described above. Cannot see plaintext. Cannot see encryption keys.
 - **Cloudflare**: as their privacy policy describes.
 - **Anyone with the share link (and passphrase, if used)**: can decrypt the file until it expires or burns.
-- **The public**: can see the [transparency report](https://obscr.app/transparency.html) and [status page](https://obscr.app/status.html). Both are aggregate-only.
+- **The public**: can see the [Trust Center](https://obscr.app/transparency.html), including transparency counters and status history. Both are aggregate-only.
 
 ---
 

@@ -8,6 +8,8 @@
     "build:min": "esbuild src/app.jsx --bundle=false --jsx=transform --jsx-factory=React.createElement --jsx-fragment=React.Fragment --target=es2020 --minify --legal-comments=none --define:__BUILD_SHA__=\"\\\"$(git rev-parse --short=7 HEAD 2>/dev/null || echo dev)\\\"\" --define:__BUILD_TIME__=\"\\\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\\\"\" --define:__BUILD_VERSION__=\"\\\"$(git describe --tags --abbrev=0 2>/dev/null || echo dev)\\\"\" --outfile=app.js",
     "predev": "npm run build",
     "dev": "wrangler dev",
+    "predev:docker": "npm run build",
+    "dev:docker": "wrangler dev --ip 0.0.0.0 --port 8787 --local",
     "predeploy": "npm run build:min",
     "deploy": "wrangler deploy"
   },

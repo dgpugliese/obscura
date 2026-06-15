@@ -193,6 +193,94 @@ function Dot({ color, size = 8, pulse }) {
     animation: pulse ? "obs-pulse 1.6s infinite" : void 0
   } });
 }
+function Notice({ notice, onClose }) {
+  if (!notice) return null;
+  const tone = notice.tone || "warn";
+  const color = tone === "danger" ? theme.danger : tone === "secure" ? theme.secure : theme.warn;
+  return /* @__PURE__ */ React.createElement("div", { role: "status", "aria-live": "polite", style: {
+    position: "fixed",
+    top: 70,
+    left: "50%",
+    transform: "translateX(-50%)",
+    zIndex: 40,
+    width: "min(560px, calc(100vw - 28px))",
+    border: `1px solid ${color}`,
+    background: theme.panel,
+    color: theme.ink,
+    borderRadius: 6,
+    boxShadow: "0 18px 60px rgba(0,0,0,0.45)",
+    fontFamily: "var(--mono)"
+  } }, /* @__PURE__ */ React.createElement("div", { style: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: 14,
+    padding: "9px 12px",
+    borderBottom: `1px solid ${theme.border}`,
+    color,
+    fontSize: 10,
+    letterSpacing: "0.18em",
+    textTransform: "uppercase"
+  } }, /* @__PURE__ */ React.createElement("span", null, notice.title || "notice"), /* @__PURE__ */ React.createElement("button", { onClick: onClose, "aria-label": "Dismiss notice", style: {
+    border: `1px solid ${theme.border}`,
+    background: theme.panelLo,
+    color: theme.inkDim,
+    borderRadius: 3,
+    cursor: "pointer",
+    fontFamily: "var(--mono)",
+    fontSize: 10,
+    padding: "3px 7px"
+  } }, "close")), /* @__PURE__ */ React.createElement("div", { style: { padding: "12px 14px", color: theme.inkDim, fontSize: 12, lineHeight: 1.7 } }, notice.body));
+}
+function ConfirmDialog({ title, body, confirmLabel = "confirm", onConfirm, onCancel }) {
+  return /* @__PURE__ */ React.createElement("div", { role: "dialog", "aria-modal": "true", "aria-labelledby": "confirm-title", style: {
+    position: "fixed",
+    inset: 0,
+    zIndex: 50,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 18,
+    background: "rgba(8,9,12,0.76)",
+    backdropFilter: "blur(8px)"
+  } }, /* @__PURE__ */ React.createElement("div", { style: {
+    width: "min(460px, 100%)",
+    border: `1px solid ${theme.danger}`,
+    background: theme.panel,
+    borderRadius: 6,
+    boxShadow: "0 18px 70px rgba(0,0,0,0.55)",
+    fontFamily: "var(--mono)"
+  } }, /* @__PURE__ */ React.createElement("div", { id: "confirm-title", style: {
+    padding: "10px 14px",
+    borderBottom: `1px solid ${theme.border}`,
+    color: theme.danger,
+    fontSize: 10,
+    letterSpacing: "0.18em",
+    textTransform: "uppercase"
+  } }, title), /* @__PURE__ */ React.createElement("div", { style: { padding: 16, color: theme.inkDim, fontSize: 12, lineHeight: 1.7 } }, body), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "flex-end", gap: 8, padding: "0 16px 16px" } }, /* @__PURE__ */ React.createElement("button", { onClick: onCancel, style: {
+    padding: "9px 13px",
+    border: `1px solid ${theme.border}`,
+    background: theme.panelHi,
+    color: theme.ink,
+    fontFamily: "var(--mono)",
+    fontSize: 10,
+    letterSpacing: "0.16em",
+    textTransform: "uppercase",
+    borderRadius: 3,
+    cursor: "pointer"
+  } }, "cancel"), /* @__PURE__ */ React.createElement("button", { onClick: onConfirm, style: {
+    padding: "9px 13px",
+    border: `1px solid ${theme.danger}`,
+    background: "transparent",
+    color: theme.danger,
+    fontFamily: "var(--mono)",
+    fontSize: 10,
+    letterSpacing: "0.16em",
+    textTransform: "uppercase",
+    borderRadius: 3,
+    cursor: "pointer"
+  } }, confirmLabel))));
+}
 function IcLock({ size = 16, color }) {
   return /* @__PURE__ */ React.createElement("svg", { width: size, height: size, viewBox: "0 0 16 16", fill: "none" }, /* @__PURE__ */ React.createElement("path", { d: "M4 7V5a4 4 0 0 1 8 0v2", stroke: color, strokeWidth: "1.4" }), /* @__PURE__ */ React.createElement("rect", { x: "2.5", y: "7", width: "11", height: "7", rx: "1.5", stroke: color, strokeWidth: "1.4" }), /* @__PURE__ */ React.createElement("circle", { cx: "8", cy: "10", r: "1", fill: color }));
 }
@@ -615,10 +703,11 @@ function hexLine(bytes) {
   }
   return s;
 }
-const BUILD_SHA = true ? "db4d96c" : "dev";
+const BUILD_SHA = true ? "7f4be5c" : "dev";
 const MARKETING_MODE = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("marketing") === "1";
-const BUILD_TIME = true ? "2026-05-12T03:29:41Z" : "";
+const BUILD_TIME = true ? "2026-06-15T02:04:01Z" : "";
 const BUILD_VERSION = true ? "v0.1.1" : "dev";
+const DOWNLOAD_OPTIONS = [1, 3, 5, 10];
 function useNarrow(threshold = 720) {
   const [narrow, setNarrow] = useState(() => typeof window !== "undefined" && window.innerWidth < threshold);
   useEffect(() => {
@@ -631,6 +720,9 @@ function useNarrow(threshold = 720) {
 function clampNum(n, min, max, fallback) {
   if (!Number.isFinite(n)) return fallback;
   return Math.max(min, Math.min(max, n));
+}
+function allowedDownloadCount(n, fallback = 3) {
+  return DOWNLOAD_OPTIONS.includes(n) ? n : fallback;
 }
 function tryUpload(blob, { ttl, maxDL }, onProgress) {
   return new Promise((resolve) => {
@@ -675,28 +767,7 @@ function downloadBytes(name, bytes, type = "application/octet-stream") {
   a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 2e3);
 }
-function LayoutToggle({ layout, setLayout }) {
-  const opts = [
-    { v: "centered", label: "CENTER" },
-    { v: "sidebar", label: "PRO" },
-    { v: "terminal", label: "TERM" }
-  ];
-  return /* @__PURE__ */ React.createElement("div", { style: { display: "flex", border: `1px solid ${theme.border}`, borderRadius: 3, overflow: "hidden" } }, opts.map((o) => {
-    const on = layout === o.v;
-    return /* @__PURE__ */ React.createElement("button", { key: o.v, onClick: () => setLayout(o.v), style: {
-      padding: "4px 8px",
-      background: on ? theme.accentSoft : "transparent",
-      color: on ? theme.accent : theme.inkDim,
-      border: "none",
-      borderLeft: o.v === "sidebar" || o.v === "terminal" ? `1px solid ${theme.border}` : "none",
-      fontFamily: "var(--mono)",
-      fontSize: 10,
-      letterSpacing: "0.14em",
-      cursor: "pointer"
-    } }, o.label);
-  }));
-}
-function TopBar({ subtitle, layout, setLayout, narrow = false, marketing = false }) {
+function TopBar({ subtitle, narrow = false, marketing = false }) {
   return /* @__PURE__ */ React.createElement("div", { style: {
     display: "flex",
     alignItems: "center",
@@ -719,7 +790,7 @@ function TopBar({ subtitle, layout, setLayout, narrow = false, marketing = false
   } }, /* @__PURE__ */ React.createElement(IcLock, { size: 12, color: theme.accent })), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 14, fontWeight: 700, letterSpacing: "0.32em", color: theme.ink } }, "OBSCURA"), !narrow && !marketing && /* @__PURE__ */ React.createElement(
     "a",
     {
-      href: BUILD_SHA && BUILD_SHA !== "dev" ? `https://github.com/dgpugliese/Obsecura/commit/${BUILD_SHA}` : "#",
+      href: BUILD_SHA && BUILD_SHA !== "dev" ? `https://github.com/dgpugliese/obscura/commit/${BUILD_SHA}` : "#",
       target: "_blank",
       rel: "noopener",
       title: BUILD_TIME ? `built ${BUILD_TIME}` : "build identifier",
@@ -733,14 +804,14 @@ function TopBar({ subtitle, layout, setLayout, narrow = false, marketing = false
     BUILD_VERSION,
     " \xB7 build ",
     BUILD_SHA
-  )), !narrow && /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", { style: { width: 1, height: 18, background: theme.border, margin: "0 4px" } }), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 11, color: theme.inkDim, whiteSpace: "nowrap" } }, /* @__PURE__ */ React.createElement("a", { href: "/transparency.html", style: { color: theme.inkDim, textDecoration: "none" } }, "transparency"), " \xB7 ", /* @__PURE__ */ React.createElement("a", { href: "/status.html", style: { color: theme.inkDim, textDecoration: "none" } }, "status"), " \xB7 ", /* @__PURE__ */ React.createElement("a", { href: "/privacy.html", style: { color: theme.inkDim, textDecoration: "none" } }, "privacy"), " \xB7 ", /* @__PURE__ */ React.createElement("a", { href: "/support.html", style: { color: theme.inkDim, textDecoration: "none" } }, "support")))), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: narrow ? 8 : 14, fontSize: 11, color: theme.inkDim } }, subtitle && !narrow && !marketing && /* @__PURE__ */ React.createElement("span", { style: { color: theme.inkFaint } }, subtitle), !narrow && !marketing && /* @__PURE__ */ React.createElement(Clock, { color: theme.ink }), !narrow && !marketing && /* @__PURE__ */ React.createElement(Tag, { secure: true }, /* @__PURE__ */ React.createElement(Dot, { color: theme.secure, pulse: true }), " secure"), /* @__PURE__ */ React.createElement(Tag, { accent: true }, "ZK \xB7 OK"), !narrow && /* @__PURE__ */ React.createElement(LayoutToggle, { layout, setLayout })));
+  )), !narrow && /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", { style: { width: 1, height: 18, background: theme.border, margin: "0 4px" } }), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 11, color: theme.inkDim, whiteSpace: "nowrap" } }, /* @__PURE__ */ React.createElement("a", { href: "/transparency.html", style: { color: theme.inkDim, textDecoration: "none" } }, "trust center")))), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: narrow ? 8 : 14, fontSize: 11, color: theme.inkDim } }, subtitle && !narrow && !marketing && /* @__PURE__ */ React.createElement("span", { style: { color: theme.inkFaint } }, subtitle), !narrow && !marketing && /* @__PURE__ */ React.createElement(Clock, { color: theme.ink }), !narrow && !marketing && /* @__PURE__ */ React.createElement(Tag, { secure: true }, /* @__PURE__ */ React.createElement(Dot, { color: theme.secure, pulse: true }), " secure"), /* @__PURE__ */ React.createElement(Tag, { accent: true }, "ZK \xB7 OK")));
 }
 function SpecStrip({ active = false, narrow = false, stats = null, ttl = 24, maxDL = 1 }) {
   const entropy = stats?.ctEntropy;
   const entropyWhole = entropy != null ? Math.floor(entropy) : null;
   const entropyFrac = entropy != null ? entropy.toFixed(3).split(".")[1] : null;
   const entropyPct = entropy != null ? Math.min(100, entropy / 8 * 100) : 0;
-  return /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: narrow ? "repeat(2, 1fr)" : "repeat(4, 1fr)", gap: 14 } }, /* @__PURE__ */ React.createElement(Panel, { label: "cipher", right: "01" }, /* @__PURE__ */ React.createElement("div", { style: { padding: "14px 14px 12px" } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 22, fontWeight: 700, color: theme.ink, fontFamily: "var(--mono)" } }, "AES-256", /* @__PURE__ */ React.createElement("span", { style: { color: theme.accent } }, "/GCM")), /* @__PURE__ */ React.createElement("div", { style: { marginTop: 8, fontSize: 10, color: theme.inkDim, fontFamily: "var(--mono)", lineHeight: 1.7 } }, /* @__PURE__ */ React.createElement("div", null, "nonce \xB7\xB7\xB7 96 bit \xB7 per-message random"), /* @__PURE__ */ React.createElement("div", null, "tag \xB7\xB7\xB7\xB7\xB7 128 bit \xB7 authenticated"), /* @__PURE__ */ React.createElement("div", null, "kdf \xB7\xB7\xB7\xB7\xB7 argon2id \xB7 m=64MB t=3 (passphrase mode)")))), /* @__PURE__ */ React.createElement(Panel, { label: "server access", right: "02" }, /* @__PURE__ */ React.createElement("div", { style: { padding: "14px 14px 12px" } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 22, fontWeight: 700, color: theme.ink, fontFamily: "var(--mono)" } }, "ZERO\u2013", /* @__PURE__ */ React.createElement("span", { style: { color: theme.accent } }, "KNOWLEDGE")), /* @__PURE__ */ React.createElement("div", { style: { marginTop: 8, fontSize: 10, color: theme.inkDim, fontFamily: "var(--mono)", lineHeight: 1.7 } }, /* @__PURE__ */ React.createElement("div", null, "operator can read \xB7\xB7\xB7\xB7 ", /* @__PURE__ */ React.createElement("span", { style: { color: theme.ink } }, "ciphertext only")), /* @__PURE__ */ React.createElement("div", null, "keys leave device \xB7\xB7\xB7\xB7 ", /* @__PURE__ */ React.createElement("span", { style: { color: theme.ink } }, "never")), /* @__PURE__ */ React.createElement("div", null, "app access logs \xB7\xB7\xB7\xB7\xB7\xB7 ", /* @__PURE__ */ React.createElement("span", { style: { color: theme.ink } }, "none"))))), /* @__PURE__ */ React.createElement(Panel, { label: "ttl", right: "03" }, /* @__PURE__ */ React.createElement("div", { style: { padding: "14px 14px 12px" } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 22, fontWeight: 700, color: theme.ink, fontFamily: "var(--mono)" } }, ttl, /* @__PURE__ */ React.createElement("span", { style: { color: theme.inkFaint } }, "h"), " / ", maxDL, /* @__PURE__ */ React.createElement("span", { style: { color: theme.inkFaint } }, "dl")), /* @__PURE__ */ React.createElement("div", { style: { marginTop: 8, fontSize: 10, color: theme.inkDim, fontFamily: "var(--mono)", lineHeight: 1.7 } }, /* @__PURE__ */ React.createElement("div", null, "self-destructs after read"), /* @__PURE__ */ React.createElement("div", null, "or ", /* @__PURE__ */ React.createElement(Countdown, { color: theme.ink }), " remaining"), /* @__PURE__ */ React.createElement("div", null, "purge \xB7\xB7\xB7 R2 delete + KV delete")))), /* @__PURE__ */ React.createElement(Panel, { label: "entropy", right: "04" }, /* @__PURE__ */ React.createElement("div", { style: { padding: "14px 14px 12px" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "baseline", justifyContent: "space-between" } }, entropy != null ? /* @__PURE__ */ React.createElement("div", { style: { fontSize: 22, fontWeight: 700, color: theme.ink, fontFamily: "var(--mono)" } }, entropyWhole, ".", /* @__PURE__ */ React.createElement("span", { style: { color: theme.accent } }, entropyFrac)) : /* @__PURE__ */ React.createElement("div", { style: { fontSize: 22, fontWeight: 700, color: theme.inkFaint, fontFamily: "var(--mono)" } }, "\u2014.", /* @__PURE__ */ React.createElement("span", null, "\u2014\u2014\u2014")), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 10, color: theme.inkFaint, fontFamily: "var(--mono)" } }, "bits/byte")), /* @__PURE__ */ React.createElement("div", { style: { marginTop: 8, height: 6, background: theme.panelLo, border: `1px solid ${theme.border}`, borderRadius: 2, overflow: "hidden" } }, /* @__PURE__ */ React.createElement("div", { style: { width: entropyPct + "%", height: "100%", background: theme.accent, transition: "width 0.4s ease-out" } })), /* @__PURE__ */ React.createElement("div", { style: { marginTop: 6, fontSize: 9, color: theme.inkFaint, fontFamily: "var(--mono)", letterSpacing: "0.06em" } }, entropy != null ? `shannon \xB7 ${stats.ctBytes >= 65536 ? "64KB sample" : "full ciphertext"}` : "awaiting payload"))));
+  return /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: narrow ? "1fr" : "repeat(4, 1fr)", gap: 14 } }, /* @__PURE__ */ React.createElement(Panel, { label: "cipher", right: "01" }, /* @__PURE__ */ React.createElement("div", { style: { padding: "14px 14px 12px" } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 22, fontWeight: 700, color: theme.ink, fontFamily: "var(--mono)" } }, "AES-256", /* @__PURE__ */ React.createElement("span", { style: { color: theme.accent } }, "/GCM")), /* @__PURE__ */ React.createElement("div", { style: { marginTop: 8, fontSize: 10, color: theme.inkDim, fontFamily: "var(--mono)", lineHeight: 1.7 } }, /* @__PURE__ */ React.createElement("div", null, "nonce \xB7\xB7\xB7 96 bit \xB7 per-message random"), /* @__PURE__ */ React.createElement("div", null, "tag \xB7\xB7\xB7\xB7\xB7 128 bit \xB7 authenticated"), /* @__PURE__ */ React.createElement("div", null, "kdf \xB7\xB7\xB7\xB7\xB7 argon2id \xB7 m=64MB t=3 (passphrase mode)")))), /* @__PURE__ */ React.createElement(Panel, { label: "server access", right: "02" }, /* @__PURE__ */ React.createElement("div", { style: { padding: "14px 14px 12px" } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 22, fontWeight: 700, color: theme.ink, fontFamily: "var(--mono)" } }, "ZERO\u2013", /* @__PURE__ */ React.createElement("span", { style: { color: theme.accent } }, "KNOWLEDGE")), /* @__PURE__ */ React.createElement("div", { style: { marginTop: 8, fontSize: 10, color: theme.inkDim, fontFamily: "var(--mono)", lineHeight: 1.7 } }, /* @__PURE__ */ React.createElement("div", null, "operator can read \xB7\xB7\xB7\xB7 ", /* @__PURE__ */ React.createElement("span", { style: { color: theme.ink } }, "ciphertext only")), /* @__PURE__ */ React.createElement("div", null, "keys leave device \xB7\xB7\xB7\xB7 ", /* @__PURE__ */ React.createElement("span", { style: { color: theme.ink } }, "never")), /* @__PURE__ */ React.createElement("div", null, "app access logs \xB7\xB7\xB7\xB7\xB7\xB7 ", /* @__PURE__ */ React.createElement("span", { style: { color: theme.ink } }, "none"))))), /* @__PURE__ */ React.createElement(Panel, { label: "ttl", right: "03" }, /* @__PURE__ */ React.createElement("div", { style: { padding: "14px 14px 12px" } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 22, fontWeight: 700, color: theme.ink, fontFamily: "var(--mono)" } }, ttl, /* @__PURE__ */ React.createElement("span", { style: { color: theme.inkFaint } }, "h"), " / ", maxDL, /* @__PURE__ */ React.createElement("span", { style: { color: theme.inkFaint } }, "dl")), /* @__PURE__ */ React.createElement("div", { style: { marginTop: 8, fontSize: 10, color: theme.inkDim, fontFamily: "var(--mono)", lineHeight: 1.7 } }, /* @__PURE__ */ React.createElement("div", null, "self-destructs after read"), /* @__PURE__ */ React.createElement("div", null, "or ", /* @__PURE__ */ React.createElement(Countdown, { color: theme.ink }), " remaining"), /* @__PURE__ */ React.createElement("div", null, "purge \xB7\xB7\xB7 R2 delete + KV delete")))), /* @__PURE__ */ React.createElement(Panel, { label: "entropy", right: "04" }, /* @__PURE__ */ React.createElement("div", { style: { padding: "14px 14px 12px" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "baseline", justifyContent: "space-between" } }, entropy != null ? /* @__PURE__ */ React.createElement("div", { style: { fontSize: 22, fontWeight: 700, color: theme.ink, fontFamily: "var(--mono)" } }, entropyWhole, ".", /* @__PURE__ */ React.createElement("span", { style: { color: theme.accent } }, entropyFrac)) : /* @__PURE__ */ React.createElement("div", { style: { fontSize: 22, fontWeight: 700, color: theme.inkFaint, fontFamily: "var(--mono)" } }, "\u2014.", /* @__PURE__ */ React.createElement("span", null, "\u2014\u2014\u2014")), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 10, color: theme.inkFaint, fontFamily: "var(--mono)" } }, "bits/byte")), /* @__PURE__ */ React.createElement("div", { style: { marginTop: 8, height: 6, background: theme.panelLo, border: `1px solid ${theme.border}`, borderRadius: 2, overflow: "hidden" } }, /* @__PURE__ */ React.createElement("div", { style: { width: entropyPct + "%", height: "100%", background: theme.accent, transition: "width 0.4s ease-out" } })), /* @__PURE__ */ React.createElement("div", { style: { marginTop: 6, fontSize: 9, color: theme.inkFaint, fontFamily: "var(--mono)", letterSpacing: "0.06em" } }, entropy != null ? `shannon \xB7 ${stats.ctBytes >= 65536 ? "64KB sample" : "full ciphertext"}` : "awaiting payload"))));
 }
 function LeftRail({ screen, active = false, stats = null, events = [], passEnabled = false }) {
   const fpRows = stats?.keyFpHex ? fingerprintRows(stats.keyFpHex) : null;
@@ -805,10 +876,10 @@ function PayloadInline({ files }) {
     transition: "width 0.2s linear"
   } })), /* @__PURE__ */ React.createElement("div", { style: { marginTop: 4, display: "flex", justifyContent: "space-between", fontFamily: "var(--mono)", fontSize: 9, color: theme.inkFaint, letterSpacing: "0.1em", textTransform: "uppercase" } }, /* @__PURE__ */ React.createElement("span", { style: { color: f.state === "sealed" ? theme.secure : f.state === "encrypting" ? theme.accent : theme.inkFaint } }, f.state === "sealed" ? "\u25CF sealed" : f.state === "encrypting" ? "\u25CF encrypting" : "\u25CB queued"), /* @__PURE__ */ React.createElement("span", null, Math.round(f.pct), "%"))))));
 }
-function HeroEmpty({ onBrowse, onSettings, onCompose, ttl, maxDL }) {
+function HeroEmpty({ onBrowse, onSettings, onCompose, ttl, maxDL, narrow = false }) {
   return /* @__PURE__ */ React.createElement("div", { style: {
     position: "relative",
-    height: 360,
+    height: narrow ? 332 : 360,
     borderRadius: 6,
     border: `1px dashed ${theme.borderHi}`,
     background: `radial-gradient(circle at 50% 50%, ${theme.panelHi}, ${theme.panelLo} 70%)`,
@@ -819,16 +890,16 @@ function HeroEmpty({ onBrowse, onSettings, onCompose, ttl, maxDL }) {
     { top: 10, right: 10, rot: 90 },
     { bottom: 10, right: 10, rot: 180 },
     { bottom: 10, left: 10, rot: 270 }
-  ].map((c, i) => /* @__PURE__ */ React.createElement("svg", { key: i, width: "22", height: "22", style: { position: "absolute", ...c, transform: `rotate(${c.rot}deg)` } }, /* @__PURE__ */ React.createElement("path", { d: "M2 22 L2 2 L22 2", fill: "none", stroke: theme.accent, strokeWidth: "1.5" }))), /* @__PURE__ */ React.createElement("svg", { width: "100%", height: "100%", style: { position: "absolute", inset: 0, opacity: 0.18 } }, /* @__PURE__ */ React.createElement("defs", null, /* @__PURE__ */ React.createElement("pattern", { id: "grid-empty", width: "24", height: "24", patternUnits: "userSpaceOnUse" }, /* @__PURE__ */ React.createElement("path", { d: "M 24 0 L 0 0 0 24", fill: "none", stroke: theme.inkFaint, strokeWidth: "0.5" }))), /* @__PURE__ */ React.createElement("rect", { width: "100%", height: "100%", fill: "url(#grid-empty)" })), /* @__PURE__ */ React.createElement("div", { style: { position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" } }, /* @__PURE__ */ React.createElement("div", { style: {
-    width: 76,
-    height: 76,
+  ].map((c, i) => /* @__PURE__ */ React.createElement("svg", { key: i, width: "22", height: "22", style: { position: "absolute", ...c, transform: `rotate(${c.rot}deg)` } }, /* @__PURE__ */ React.createElement("path", { d: "M2 22 L2 2 L22 2", fill: "none", stroke: theme.accent, strokeWidth: "1.5" }))), /* @__PURE__ */ React.createElement("svg", { width: "100%", height: "100%", style: { position: "absolute", inset: 0, opacity: 0.18 } }, /* @__PURE__ */ React.createElement("defs", null, /* @__PURE__ */ React.createElement("pattern", { id: "grid-empty", width: "24", height: "24", patternUnits: "userSpaceOnUse" }, /* @__PURE__ */ React.createElement("path", { d: "M 24 0 L 0 0 0 24", fill: "none", stroke: theme.inkFaint, strokeWidth: "0.5" }))), /* @__PURE__ */ React.createElement("rect", { width: "100%", height: "100%", fill: "url(#grid-empty)" })), /* @__PURE__ */ React.createElement("div", { style: { position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: narrow ? "28px 18px" : 0 } }, /* @__PURE__ */ React.createElement("div", { style: {
+    width: narrow ? 64 : 76,
+    height: narrow ? 64 : 76,
     borderRadius: 8,
     border: `1px solid ${theme.accentLine}`,
     background: theme.accentSoft,
     display: "flex",
     alignItems: "center",
     justifyContent: "center"
-  } }, /* @__PURE__ */ React.createElement(IcPlus, { size: 36, color: theme.accent, weight: 1.6 })), /* @__PURE__ */ React.createElement("div", { style: { marginTop: 18, fontFamily: "var(--mono)", fontSize: 26, fontWeight: 700, color: theme.ink } }, "drop_files ", /* @__PURE__ */ React.createElement("span", { style: { color: theme.accent } }, "--encrypt")), /* @__PURE__ */ React.createElement("div", { style: { marginTop: 6, fontFamily: "var(--mono)", fontSize: 12, color: theme.inkDim } }, "max 50MB \xB7 or click to browse \xB7 pasted text accepted"), /* @__PURE__ */ React.createElement("div", { style: { marginTop: 16, display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "center" } }, /* @__PURE__ */ React.createElement(Tag, null, "\u2318 + V paste"), /* @__PURE__ */ React.createElement(Tag, null, "\u2318 + O browse"), /* @__PURE__ */ React.createElement(Tag, null, "folder ok")), /* @__PURE__ */ React.createElement("div", { style: { marginTop: 14, display: "flex", gap: 8 } }, /* @__PURE__ */ React.createElement("button", { onClick: (e) => {
+  } }, /* @__PURE__ */ React.createElement(IcPlus, { size: narrow ? 30 : 36, color: theme.accent, weight: 1.6 })), /* @__PURE__ */ React.createElement("div", { style: { marginTop: 18, fontFamily: "var(--mono)", fontSize: narrow ? 24 : 26, fontWeight: 700, color: theme.ink, textAlign: "center", lineHeight: 1.18 } }, "drop_files ", /* @__PURE__ */ React.createElement("span", { style: { color: theme.accent } }, "--encrypt")), /* @__PURE__ */ React.createElement("div", { style: { marginTop: 8, fontFamily: "var(--mono)", fontSize: 12, color: theme.inkDim, textAlign: "center", lineHeight: 1.55, maxWidth: narrow ? 300 : "none" } }, narrow ? "max 50MB \xB7 tap to browse \xB7 pasted text accepted" : "max 50MB \xB7 or click to browse \xB7 pasted text accepted"), /* @__PURE__ */ React.createElement("div", { style: { marginTop: 16, display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "center" } }, /* @__PURE__ */ React.createElement(Tag, null, narrow ? "paste text" : "\u2318 + V paste"), /* @__PURE__ */ React.createElement(Tag, null, narrow ? "tap browse" : "\u2318 + O browse"), /* @__PURE__ */ React.createElement(Tag, null, "folder ok")), /* @__PURE__ */ React.createElement("div", { style: { marginTop: 14, display: "flex", gap: 8, flexDirection: narrow ? "column" : "row", width: narrow ? "100%" : "auto", maxWidth: 340 } }, /* @__PURE__ */ React.createElement("button", { onClick: (e) => {
     e.stopPropagation();
     onCompose?.();
   }, style: {
@@ -841,7 +912,8 @@ function HeroEmpty({ onBrowse, onSettings, onCompose, ttl, maxDL }) {
     letterSpacing: "0.18em",
     textTransform: "uppercase",
     borderRadius: 3,
-    cursor: "pointer"
+    cursor: "pointer",
+    width: narrow ? "100%" : "auto"
   } }, "compose text"), /* @__PURE__ */ React.createElement("button", { onClick: (e) => {
     e.stopPropagation();
     onSettings?.();
@@ -855,7 +927,8 @@ function HeroEmpty({ onBrowse, onSettings, onCompose, ttl, maxDL }) {
     letterSpacing: "0.18em",
     textTransform: "uppercase",
     borderRadius: 3,
-    cursor: "pointer"
+    cursor: "pointer",
+    width: narrow ? "100%" : "auto"
   } }, "ttl ", ttl, "h \xB7 ", maxDL, "x \xB7 configure"))), /* @__PURE__ */ React.createElement("div", { style: { position: "absolute", left: 16, bottom: 12, fontFamily: "var(--mono)", fontSize: 10, color: theme.inkFaint } }, "idle \xB7 awaiting input"), /* @__PURE__ */ React.createElement("div", { style: { position: "absolute", right: 16, bottom: 12, fontFamily: "var(--mono)", fontSize: 10, color: theme.inkFaint } }, /* @__PURE__ */ React.createElement(ScrambleText, { value: "0x00000000", speed: 200, color: theme.inkFaint })));
 }
 function HeroDragOver({ files }) {
@@ -923,6 +996,7 @@ function HeroDone({ files, onReset, link, onDownload, mode, passphrase, onBurn, 
   const [copied, setCopied] = useState(false);
   const [showQR, setShowQR] = useState(false);
   const displayLink = link ? link.replace(/^https?:\/\//, "") : "obs.cr/d/local";
+  const displayProtocol = link?.startsWith("http://") ? "http://" : "https://";
   const remote = mode === "remote";
   const copy = () => {
     if (!link) return;
@@ -966,7 +1040,7 @@ function HeroDone({ files, onReset, link, onDownload, mode, passphrase, onBurn, 
     overflow: "hidden",
     textOverflow: "ellipsis",
     whiteSpace: "nowrap"
-  } }, /* @__PURE__ */ React.createElement("span", { style: { color: theme.inkFaint } }, "https://"), /* @__PURE__ */ React.createElement(ScrambleText, { value: displayLink, speed: 110, color: theme.ink })), /* @__PURE__ */ React.createElement("button", { onClick: copy, style: {
+  } }, /* @__PURE__ */ React.createElement("span", { style: { color: theme.inkFaint } }, displayProtocol), /* @__PURE__ */ React.createElement(ScrambleText, { value: displayLink, speed: 110, color: theme.ink })), /* @__PURE__ */ React.createElement("button", { onClick: copy, style: {
     padding: "16px 18px",
     border: `1px solid ${theme.accentLine}`,
     background: theme.accentSoft,
@@ -1092,7 +1166,7 @@ function HeroDone({ files, onReset, link, onDownload, mode, passphrase, onBurn, 
     fontFamily: "var(--mono)",
     fontSize: 10.5,
     color: theme.inkDim
-  } }, /* @__PURE__ */ React.createElement("span", null, "obscura is free & open source \xB7 tips keep the lights on"), /* @__PURE__ */ React.createElement("a", { href: "/support.html", style: {
+  } }, /* @__PURE__ */ React.createElement("span", null, "obscura is free & open source \xB7 tips keep the lights on"), /* @__PURE__ */ React.createElement("a", { href: "/transparency.html#support", style: {
     color: theme.accent,
     textDecoration: "none",
     fontSize: 10,
@@ -1236,7 +1310,7 @@ function HeroSettings({ ttl, setTtl, maxDL, setMaxDL, passEnabled, setPassEnable
     border: `1px solid ${theme.border}`,
     borderRadius: 4,
     background: theme.panelHi
-  } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "space-between", fontFamily: "var(--mono)", fontSize: 9, color: theme.inkFaint, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 12 } }, /* @__PURE__ */ React.createElement("span", null, "downloads"), /* @__PURE__ */ React.createElement("span", null, "02")), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "var(--mono)", fontSize: 28, fontWeight: 700, color: theme.ink } }, maxDL, /* @__PURE__ */ React.createElement("span", { style: { color: theme.inkFaint } }, "x")), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 6, marginTop: 12 } }, [1, 3, 5, 10].map((n) => /* @__PURE__ */ React.createElement("button", { key: n, onClick: () => setMaxDL(n), style: {
+  } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "space-between", fontFamily: "var(--mono)", fontSize: 9, color: theme.inkFaint, letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 12 } }, /* @__PURE__ */ React.createElement("span", null, "downloads"), /* @__PURE__ */ React.createElement("span", null, "02")), /* @__PURE__ */ React.createElement("div", { style: { fontFamily: "var(--mono)", fontSize: 28, fontWeight: 700, color: theme.ink } }, maxDL, /* @__PURE__ */ React.createElement("span", { style: { color: theme.inkFaint } }, "x")), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 6, marginTop: 12 } }, DOWNLOAD_OPTIONS.map((n) => /* @__PURE__ */ React.createElement("button", { key: n, onClick: () => setMaxDL(n), style: {
     flex: 1,
     padding: "8px 0",
     border: `1px solid ${maxDL === n ? theme.accentLine : theme.border}`,
@@ -1343,23 +1417,18 @@ function App() {
   const [stage, setStage] = useState(null);
   const [uploadPct, setUploadPct] = useState(0);
   const downloadedRef = useRef(false);
-  const [layout, setLayoutState] = useState(() => {
-    return localStorage.getItem("obscura.layout") || "centered";
-  });
-  const setLayout = (v) => {
-    setLayoutState(v);
-    localStorage.setItem("obscura.layout", v);
-  };
   const [ttl, setTtl] = useState(() => {
     const allowed = [1, 2, 4, 8, 12, 24];
     const raw = parseInt(localStorage.getItem("obscura.ttl"), 10);
     return allowed.includes(raw) ? raw : 24;
   });
-  const [maxDL, setMaxDL] = useState(() => clampNum(parseInt(localStorage.getItem("obscura.maxdl"), 10), 1, 100, 3));
+  const [maxDL, setMaxDL] = useState(() => allowedDownloadCount(parseInt(localStorage.getItem("obscura.maxdl"), 10)));
   const [passEnabled, setPassEnabled] = useState(() => localStorage.getItem("obscura.passEnabled") === "1");
   const [passphrase, setPassphrase] = useState(() => generatePassphrase());
   const [cryptoStats, setCryptoStats] = useState(null);
   const [auditEvents, setAuditEvents] = useState([]);
+  const [notice, setNotice] = useState(null);
+  const [burnConfirm, setBurnConfirm] = useState(false);
   useEffect(() => {
     localStorage.setItem("obscura.ttl", String(ttl));
   }, [ttl]);
@@ -1416,13 +1485,11 @@ function App() {
       let encMeta = null;
       if (passEnabled) {
         if (typeof argon2 === "undefined" || !argon2.hash) {
-          alert("argon2 wasm hasn't loaded yet \u2014 disabling passphrase for this send.");
           setPassEnabled(false);
           throw new Error("argon2 unavailable");
         }
         const trimmed = passphrase.trim();
         if (!trimmed) {
-          alert("Passphrase is empty. Open Settings to generate or enter one.");
           throw new Error("empty passphrase");
         }
         passUsed = trimmed;
@@ -1474,7 +1541,11 @@ function App() {
       setScreen("done");
     } catch (err) {
       console.error("encrypt failed", err);
-      alert("Encryption failed: " + err.message);
+      setNotice({
+        tone: "danger",
+        title: "encryption failed",
+        body: err.message === "empty passphrase" ? "Passphrase mode is enabled, but the passphrase is empty. Open Settings to generate or enter one." : err.message === "argon2 unavailable" ? "Argon2id has not finished loading, so passphrase mode was disabled for this send. Try again in a moment." : `Encryption failed: ${err.message}`
+      });
       setStage(null);
       setScreen("empty");
       setFiles([]);
@@ -1537,12 +1608,22 @@ function App() {
   };
   const burnNow = useCallback(async () => {
     if (!result?.id) return;
-    if (!confirm("Burn this share now? The recipient link will return 410.")) return;
     try {
       await fetch(`/api/d/${result.id}`, { method: "DELETE" });
+      setNotice({
+        tone: "secure",
+        title: "share burned",
+        body: "The ciphertext and metadata were purged. The recipient link now resolves as spent."
+      });
     } catch (err) {
       console.warn("delete failed (may already be gone)", err);
+      setNotice({
+        tone: "warn",
+        title: "burn requested",
+        body: "The delete request did not complete cleanly. The share may already be expired or gone."
+      });
     }
+    setBurnConfirm(false);
     reset();
   }, [result]);
   useEffect(() => {
@@ -1571,12 +1652,11 @@ function App() {
   }, [screen, acceptFiles]);
   let hero;
   const active = screen === "encrypting" || screen === "done";
-  const effectiveLayout = narrow ? "centered" : layout;
-  if (screen === "empty") hero = /* @__PURE__ */ React.createElement(HeroEmpty, { onBrowse: browse, onSettings: () => setScreen("settings"), onCompose: () => setScreen("compose"), ttl, maxDL });
+  if (screen === "empty") hero = /* @__PURE__ */ React.createElement(HeroEmpty, { onBrowse: browse, onSettings: () => setScreen("settings"), onCompose: () => setScreen("compose"), ttl, maxDL, narrow });
   else if (screen === "compose") hero = /* @__PURE__ */ React.createElement(HeroCompose, { onSend: (files2) => acceptFiles(files2), onClose: () => setScreen("empty") });
   else if (screen === "drag") hero = /* @__PURE__ */ React.createElement(HeroDragOver, { files });
   else if (screen === "encrypting") hero = /* @__PURE__ */ React.createElement(HeroEncrypting, { files, stage, uploadPct });
-  else if (screen === "done") hero = /* @__PURE__ */ React.createElement(HeroDone, { files, onReset: reset, link: result?.link, onDownload: saveAgain, mode: result?.mode, passphrase: result?.passphrase, onBurn: burnNow, canBurn: result?.mode === "remote" && !!result?.id });
+  else if (screen === "done") hero = /* @__PURE__ */ React.createElement(HeroDone, { files, onReset: reset, link: result?.link, onDownload: saveAgain, mode: result?.mode, passphrase: result?.passphrase, onBurn: () => setBurnConfirm(true), canBurn: result?.mode === "remote" && !!result?.id });
   else if (screen === "settings") hero = /* @__PURE__ */ React.createElement(
     HeroSettings,
     {
@@ -1599,23 +1679,26 @@ function App() {
     color: theme.ink,
     fontFamily: "var(--mono)",
     position: "relative"
-  } }, /* @__PURE__ */ React.createElement(
+  } }, /* @__PURE__ */ React.createElement("h1", { style: { position: "absolute", width: 1, height: 1, padding: 0, margin: -1, overflow: "hidden", clip: "rect(0,0,0,0)", whiteSpace: "nowrap", border: 0 } }, "Obscura encrypted file transfer"), /* @__PURE__ */ React.createElement(
     "input",
     {
       ref: fileInputRef,
       type: "file",
       multiple: true,
+      "aria-label": "Choose files to encrypt",
       style: { display: "none" },
       onChange: (e) => e.target.files && acceptFiles(e.target.files)
     }
-  ), /* @__PURE__ */ React.createElement("svg", { width: "100%", height: "100%", style: { position: "fixed", inset: 0, opacity: 0.5, pointerEvents: "none" } }, /* @__PURE__ */ React.createElement("defs", null, /* @__PURE__ */ React.createElement("pattern", { id: "bggrid", width: "48", height: "48", patternUnits: "userSpaceOnUse" }, /* @__PURE__ */ React.createElement("path", { d: "M 48 0 L 0 0 0 48", fill: "none", stroke: theme.bgGrid, strokeWidth: "1" }))), /* @__PURE__ */ React.createElement("rect", { width: "100%", height: "100%", fill: "url(#bggrid)" })), /* @__PURE__ */ React.createElement("div", { style: { position: "relative", display: "flex", flexDirection: "column", minHeight: "100vh" } }, /* @__PURE__ */ React.createElement(TopBar, { subtitle: subs[screen], layout, setLayout, narrow, marketing: MARKETING_MODE }), effectiveLayout === "sidebar" && /* @__PURE__ */ React.createElement("div", { style: {
-    flex: 1,
-    padding: 22,
-    display: "grid",
-    gridTemplateColumns: "260px 1fr 280px",
-    gap: 18,
-    minHeight: 0
-  } }, /* @__PURE__ */ React.createElement(LeftRail, { screen, active, stats: cryptoStats, events: auditEvents, passEnabled }), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 14, minWidth: 0 } }, hero, /* @__PURE__ */ React.createElement(SpecStrip, { active, stats: cryptoStats, ttl, maxDL }), /* @__PURE__ */ React.createElement(CommandStrip, { screen, marketing: MARKETING_MODE })), /* @__PURE__ */ React.createElement(RightRail, { files, active, stats: cryptoStats })), effectiveLayout === "centered" && /* @__PURE__ */ React.createElement("div", { style: {
+  ), /* @__PURE__ */ React.createElement("svg", { width: "100%", height: "100%", style: { position: "fixed", inset: 0, opacity: 0.5, pointerEvents: "none" } }, /* @__PURE__ */ React.createElement("defs", null, /* @__PURE__ */ React.createElement("pattern", { id: "bggrid", width: "48", height: "48", patternUnits: "userSpaceOnUse" }, /* @__PURE__ */ React.createElement("path", { d: "M 48 0 L 0 0 0 48", fill: "none", stroke: theme.bgGrid, strokeWidth: "1" }))), /* @__PURE__ */ React.createElement("rect", { width: "100%", height: "100%", fill: "url(#bggrid)" })), /* @__PURE__ */ React.createElement("div", { style: { position: "relative", display: "flex", flexDirection: "column", minHeight: "100vh" } }, /* @__PURE__ */ React.createElement(TopBar, { subtitle: subs[screen], narrow, marketing: MARKETING_MODE }), /* @__PURE__ */ React.createElement(Notice, { notice, onClose: () => setNotice(null) }), burnConfirm && /* @__PURE__ */ React.createElement(
+    ConfirmDialog,
+    {
+      title: "burn share now",
+      body: "This immediately purges the ciphertext and metadata. Anyone opening the recipient link after this will see a spent-share state.",
+      confirmLabel: "burn",
+      onCancel: () => setBurnConfirm(false),
+      onConfirm: burnNow
+    }
+  ), /* @__PURE__ */ React.createElement("div", { style: {
     flex: 1,
     padding: narrow ? "20px 14px" : "40px 22px",
     display: "flex",
@@ -1626,34 +1709,7 @@ function App() {
     display: "flex",
     flexDirection: "column",
     gap: narrow ? 12 : 18
-  } }, hero, /* @__PURE__ */ React.createElement(PayloadInline, { files }), /* @__PURE__ */ React.createElement(SpecStrip, { active, narrow, stats: cryptoStats, ttl, maxDL }), /* @__PURE__ */ React.createElement(CommandStrip, { screen, marketing: MARKETING_MODE }))), effectiveLayout === "terminal" && /* @__PURE__ */ React.createElement("div", { style: {
-    flex: 1,
-    padding: narrow ? "16px 12px" : "32px 22px",
-    display: "flex",
-    justifyContent: "center"
-  } }, /* @__PURE__ */ React.createElement("div", { style: {
-    width: "100%",
-    maxWidth: 920,
-    border: `1px solid ${theme.borderHi}`,
-    borderRadius: 8,
-    background: theme.panel,
-    overflow: "hidden",
-    boxShadow: "0 12px 40px rgba(0,0,0,0.5)"
-  } }, /* @__PURE__ */ React.createElement("div", { style: {
-    display: "flex",
-    alignItems: "center",
-    gap: 10,
-    padding: "10px 14px",
-    borderBottom: `1px solid ${theme.border}`,
-    background: theme.panelLo
-  } }, /* @__PURE__ */ React.createElement("span", { style: { width: 10, height: 10, borderRadius: "50%", background: "#ff5f56" } }), /* @__PURE__ */ React.createElement("span", { style: { width: 10, height: 10, borderRadius: "50%", background: "#ffbd2e" } }), /* @__PURE__ */ React.createElement("span", { style: { width: 10, height: 10, borderRadius: "50%", background: "#27c93f" } }), /* @__PURE__ */ React.createElement("span", { style: {
-    flex: 1,
-    textAlign: "center",
-    fontFamily: "var(--mono)",
-    fontSize: 11,
-    color: theme.inkDim,
-    letterSpacing: "0.18em"
-  } }, "obscura ~ encrypt"), /* @__PURE__ */ React.createElement("span", { style: { width: 60 } })), /* @__PURE__ */ React.createElement("div", { style: { padding: narrow ? 14 : 22, display: "flex", flexDirection: "column", gap: 14 } }, hero, /* @__PURE__ */ React.createElement(PayloadInline, { files }), /* @__PURE__ */ React.createElement(CommandStrip, { screen, marketing: MARKETING_MODE }))))));
+  } }, hero, /* @__PURE__ */ React.createElement(PayloadInline, { files }), /* @__PURE__ */ React.createElement(SpecStrip, { active, narrow, stats: cryptoStats, ttl, maxDL }), /* @__PURE__ */ React.createElement(CommandStrip, { screen, marketing: MARKETING_MODE })))));
 }
 function HeroDecrypt({ onPick, status, error, inputMode, passphraseExpected, passphrase, setPassphrase, onSubmitPassphrase }) {
   return /* @__PURE__ */ React.createElement("div", { style: {
@@ -1814,11 +1870,6 @@ function DecryptApp({ keyBytes, id, passphraseMode }) {
   const [phase, setPhase] = useState(id ? "fetching" : "await");
   const [outputs, setOutputs] = useState([]);
   const [error, setError] = useState(null);
-  const [layout, setLayoutState] = useState(() => localStorage.getItem("obscura.layout") || "centered");
-  const setLayout = (v) => {
-    setLayoutState(v);
-    localStorage.setItem("obscura.layout", v);
-  };
   const narrow = useNarrow();
   const [passphrase, setPassphrase] = useState("");
   const [pendingBlob, setPendingBlob] = useState(null);
@@ -1986,16 +2037,17 @@ function DecryptApp({ keyBytes, id, passphraseMode }) {
     color: theme.ink,
     fontFamily: "var(--mono)",
     position: "relative"
-  } }, /* @__PURE__ */ React.createElement(
+  } }, /* @__PURE__ */ React.createElement("h1", { style: { position: "absolute", width: 1, height: 1, padding: 0, margin: -1, overflow: "hidden", clip: "rect(0,0,0,0)", whiteSpace: "nowrap", border: 0 } }, "Obscura decrypt received file"), /* @__PURE__ */ React.createElement(
     "input",
     {
       ref: fileInputRef,
       type: "file",
       accept: ".obscura,application/octet-stream",
+      "aria-label": "Choose Obscura ciphertext to decrypt",
       style: { display: "none" },
       onChange: (e) => e.target.files?.[0] && handleFile(e.target.files[0])
     }
-  ), /* @__PURE__ */ React.createElement("svg", { width: "100%", height: "100%", style: { position: "fixed", inset: 0, opacity: 0.5, pointerEvents: "none" } }, /* @__PURE__ */ React.createElement("defs", null, /* @__PURE__ */ React.createElement("pattern", { id: "bggrid-d", width: "48", height: "48", patternUnits: "userSpaceOnUse" }, /* @__PURE__ */ React.createElement("path", { d: "M 48 0 L 0 0 0 48", fill: "none", stroke: theme.bgGrid, strokeWidth: "1" }))), /* @__PURE__ */ React.createElement("rect", { width: "100%", height: "100%", fill: "url(#bggrid-d)" })), /* @__PURE__ */ React.createElement("div", { style: { position: "relative", display: "flex", flexDirection: "column", minHeight: "100vh" } }, /* @__PURE__ */ React.createElement(TopBar, { subtitle, layout, setLayout, narrow, marketing: MARKETING_MODE }), /* @__PURE__ */ React.createElement("div", { style: {
+  ), /* @__PURE__ */ React.createElement("svg", { width: "100%", height: "100%", style: { position: "fixed", inset: 0, opacity: 0.5, pointerEvents: "none" } }, /* @__PURE__ */ React.createElement("defs", null, /* @__PURE__ */ React.createElement("pattern", { id: "bggrid-d", width: "48", height: "48", patternUnits: "userSpaceOnUse" }, /* @__PURE__ */ React.createElement("path", { d: "M 48 0 L 0 0 0 48", fill: "none", stroke: theme.bgGrid, strokeWidth: "1" }))), /* @__PURE__ */ React.createElement("rect", { width: "100%", height: "100%", fill: "url(#bggrid-d)" })), /* @__PURE__ */ React.createElement("div", { style: { position: "relative", display: "flex", flexDirection: "column", minHeight: "100vh" } }, /* @__PURE__ */ React.createElement(TopBar, { subtitle, narrow, marketing: MARKETING_MODE }), /* @__PURE__ */ React.createElement("div", { style: {
     flex: 1,
     padding: narrow ? "20px 14px" : "40px 22px",
     display: "flex",
@@ -2017,7 +2069,7 @@ function DecryptApp({ keyBytes, id, passphraseMode }) {
     justifyContent: "center",
     gap: 14,
     flexWrap: "wrap"
-  } }, /* @__PURE__ */ React.createElement("a", { href: "/transparency.html", style: { color: "inherit", textDecoration: "none" } }, "transparency"), /* @__PURE__ */ React.createElement("span", null, "\xB7"), /* @__PURE__ */ React.createElement("a", { href: "/status.html", style: { color: "inherit", textDecoration: "none" } }, "status"), /* @__PURE__ */ React.createElement("span", null, "\xB7"), /* @__PURE__ */ React.createElement("a", { href: "/privacy.html", style: { color: "inherit", textDecoration: "none" } }, "privacy"), /* @__PURE__ */ React.createElement("span", null, "\xB7"), /* @__PURE__ */ React.createElement("a", { href: "/support.html", style: { color: "inherit", textDecoration: "none" } }, "support"))))));
+  } }, /* @__PURE__ */ React.createElement("a", { href: "/transparency.html", style: { color: "inherit", textDecoration: "none" } }, "trust center"))))));
 }
 function Entry() {
   const hash = window.location.hash || "";

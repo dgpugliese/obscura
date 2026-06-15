@@ -1,0 +1,30 @@
+services:
+  obscura:
+    build:
+      context: .
+    command: npm run dev:docker
+    ports:
+      - "8787:8787"
+    environment:
+      NODE_ENV: development
+      SMTP_HOST: mailpit
+      SMTP_PORT: "1025"
+      MAILPIT_UI: http://localhost:8025
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - wrangler-state:/app/.wrangler
+    depends_on:
+      - mailpit
+
+  mailpit:
+    image: axllent/mailpit:v1.28
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    environment:
+      MP_SMTP_AUTH_ACCEPT_ANY: "1"
+      MP_SMTP_AUTH_ALLOW_INSECURE: "1"
+
+volumes:
+  wrangler-state:

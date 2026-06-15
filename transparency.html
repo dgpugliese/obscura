@@ -2,17 +2,15 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<title>OBSCURA — transparency</title>
+<title>OBSCURA — trust center</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<meta name="description" content="OBSCURA transparency report. Daily aggregate counts of shares created, burned, expired, and exhausted. No per-share data." />
+<meta name="description" content="OBSCURA trust center: live status, transparency metrics, privacy posture, security policy, and support." />
 <meta name="theme-color" content="#08090c" />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  /* Palette matches src/app.jsx so the static pages and the React app
-     read as one product. Single source of truth: the theme in app.jsx. */
   :root {
     --bg: #08090c;
     --panel: #0f1116;
@@ -32,52 +30,115 @@
     --mono: "JetBrains Mono", "Fira Code", monospace;
   }
   * { box-sizing: border-box; }
-  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--ink); font-family: var(--mono); font-size: 13px; line-height: 1.6; }
+  html { scroll-behavior: smooth; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--ink); font-family: var(--mono); font-size: 13px; line-height: 1.65; }
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.45;
+    background-image:
+      linear-gradient(var(--border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 48px 48px;
+    mask-image: linear-gradient(to bottom, black, transparent 78%);
+  }
   a { color: var(--accent); text-decoration: none; }
   a:hover { text-decoration: underline; }
-  /* Inline body-text links carry an underline so they're discernible by more than colour (WCAG 1.4.1). */
-  .note a, .lede a, .lead a, .body p a, .body li a, p a, li a { text-decoration: underline; text-underline-offset: 2px; text-decoration-color: var(--accent-line); }
-  .note a:hover, .lede a:hover, .lead a:hover, .body p a:hover, .body li a:hover, p a:hover, li a:hover { text-decoration-color: var(--accent); }
-  .wrap { max-width: 880px; margin: 0 auto; padding: 32px 20px 80px; }
-  .top { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; padding-bottom: 18px; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+  .note a, .lead a, .copy a, .body p a, .body li a, p a, li a { text-decoration: underline; text-underline-offset: 2px; text-decoration-color: var(--accent-line); }
+  .note a:hover, .lead a:hover, .copy a:hover, .body p a:hover, .body li a:hover, p a:hover, li a:hover { text-decoration-color: var(--accent); }
+  .wrap { position: relative; max-width: 1080px; margin: 0 auto; padding: 28px 20px 80px; }
+  .top { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; padding-bottom: 18px; border-bottom: 1px solid var(--border); margin-bottom: 26px; }
   .brand { font-size: 14px; font-weight: 700; letter-spacing: 0.32em; }
   .brand .v { color: var(--ink-faint); font-weight: 400; letter-spacing: 0.18em; margin-left: 10px; font-size: 10px; }
   .nav { display: flex; flex-wrap: wrap; gap: 8px 16px; }
   .nav a { color: var(--ink-dim); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; }
-  .nav a.active { color: var(--ink); }
-  .panel { background: var(--panel); border: 1px solid var(--border); border-radius: 4px; margin-bottom: 16px; }
-  .panel > .label { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; border-bottom: 1px solid var(--border); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-dim); background: var(--panel-lo); }
-  .panel > .body { padding: 14px 16px; }
-  .totals { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-  .totals .cell { background: var(--panel-lo); border: 1px solid var(--border); padding: 14px; border-radius: 3px; }
-  .totals .cell .lbl { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-faint); }
-  .totals .cell .val { font-size: 26px; font-weight: 700; color: var(--ink); margin-top: 6px; }
-  .totals .cell .sub { font-size: 10px; color: var(--ink-dim); margin-top: 2px; }
-  .totals .cell.created .val { color: var(--accent); }
-  .totals .cell.burned .val { color: var(--warn); }
-  .totals .cell.expired .val { color: var(--ink-dim); }
-  .totals .cell.exhausted .val { color: var(--ink); }
+  .nav a.active, .nav a:hover { color: var(--ink); text-decoration: none; }
+  .hero { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(280px, 0.55fr); gap: 18px; align-items: stretch; margin-bottom: 18px; }
+  .hero-main, .panel, .stat-card, .metric, .opt { background: var(--panel); border: 1px solid var(--border); border-radius: 4px; }
+  .hero-main { padding: 22px; min-height: 270px; display: flex; flex-direction: column; justify-content: space-between; }
+  h1 { margin: 0; max-width: 760px; color: var(--ink); font-size: 28px; line-height: 1.25; letter-spacing: 0; }
+  .hero-copy { margin: 14px 0 0; max-width: 760px; color: var(--ink-dim); font-size: 13px; line-height: 1.85; }
+  .hero-copy strong { color: var(--ink); font-weight: 600; }
+  .anchor-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+  .anchor-row a, .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 34px; padding: 8px 12px; border: 1px solid var(--border-hi); border-radius: 3px; color: var(--ink-dim); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; text-decoration: none; }
+  .anchor-row a:hover, .btn:hover { border-color: var(--accent-line); color: var(--accent); text-decoration: none; background: var(--accent-soft); }
+  .status-card { background: var(--panel-lo); border: 1px solid var(--border); border-radius: 4px; padding: 16px; display: flex; flex-direction: column; justify-content: space-between; gap: 20px; }
+  .eyebrow { color: var(--ink-faint); font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; }
+  .big { font-size: 20px; font-weight: 700; color: var(--ink); margin-top: 8px; }
+  .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 8px; vertical-align: middle; }
+  .dot.ok { background: var(--secure); box-shadow: 0 0 8px var(--secure); }
+  .dot.warn { background: var(--warn); }
+  .dot.crit { background: var(--crit); }
+  .dot.unknown { background: var(--ink-faint); }
+  .quick { display: grid; gap: 8px; }
+  .quick .row { display: flex; justify-content: space-between; gap: 14px; padding: 8px 0; border-top: 1px solid var(--border); font-size: 11px; color: var(--ink-dim); }
+  .quick .row .v { color: var(--ink); text-align: right; }
+  .panel { margin-bottom: 16px; scroll-margin-top: 18px; }
+  .panel > .label { display: flex; justify-content: space-between; align-items: center; gap: 14px; padding: 9px 12px; border-bottom: 1px solid var(--border); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-dim); background: var(--panel-lo); }
+  .panel > .body { padding: 16px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .metric, .stat-card, .opt { background: var(--panel-lo); padding: 14px; }
+  .metric .lbl, .stat-card .lbl, .opt .lbl { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-faint); }
+  .metric .val, .stat-card .val { font-size: 24px; font-weight: 700; color: var(--ink); margin-top: 6px; }
+  .metric .sub, .stat-card .sub, .opt .desc { font-size: 11px; color: var(--ink-dim); margin-top: 3px; line-height: 1.7; }
+  .metric.created .val { color: var(--accent); }
+  .metric.burned .val { color: var(--warn); }
+  .metric.expired .val { color: var(--ink-dim); }
+  .bars { display: grid; grid-template-columns: repeat(30, 1fr); gap: 3px; align-items: end; height: 90px; padding: 6px 0; }
+  .bars .bar { background: var(--accent); opacity: 0.85; min-height: 1px; border-radius: 1px; }
+  .bars .bar.empty { background: var(--border); opacity: 0.5; }
+  .calendar { display: grid; grid-template-columns: repeat(30, 1fr); gap: 3px; margin-top: 10px; }
+  .day { aspect-ratio: 1 / 2.5; min-height: 28px; border-radius: 2px; background: var(--secure); opacity: 0.7; cursor: default; }
+  .day.warn { background: var(--warn); opacity: 1; }
+  .day.crit { background: var(--crit); opacity: 1; }
+  .legend { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 12px; font-size: 10px; color: var(--ink-dim); letter-spacing: 0.08em; text-transform: uppercase; }
+  .legend .sw { display: inline-block; width: 10px; height: 10px; margin-right: 6px; vertical-align: middle; border-radius: 2px; }
   table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 12px; }
-  th, td { padding: 6px 8px; text-align: right; border-bottom: 1px solid var(--border); }
+  th, td { padding: 7px 8px; text-align: right; border-bottom: 1px solid var(--border); vertical-align: top; }
   th:first-child, td:first-child { text-align: left; color: var(--ink-dim); }
   th { font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-faint); font-weight: 500; }
   td { color: var(--ink); }
   td.zero { color: var(--ink-faint); }
-  .bars { display: grid; grid-template-columns: repeat(30, 1fr); gap: 3px; align-items: end; height: 90px; padding: 6px 0; }
-  .bars .bar { background: var(--accent); opacity: 0.85; min-height: 1px; border-radius: 1px; }
-  .bars .bar.empty { background: var(--border); opacity: 0.5; }
-  .abuse { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-  .abuse .cell { background: var(--panel-lo); border: 1px solid var(--border); padding: 14px; border-radius: 3px; }
-  .abuse .cell .lbl { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-faint); }
-  .abuse .cell .val { font-size: 22px; font-weight: 700; color: var(--ink); margin-top: 6px; }
-  .note { font-size: 11px; color: var(--ink-dim); margin-top: 12px; line-height: 1.7; }
+  h2 { margin: 18px 0 8px; font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink); font-weight: 600; }
+  h2:first-child { margin-top: 0; }
+  p { margin: 8px 0; color: var(--ink-dim); }
+  ul { margin: 8px 0 12px; padding-left: 18px; color: var(--ink-dim); }
+  li { margin: 4px 0; }
+  li strong, p strong { color: var(--ink); font-weight: 600; }
+  code { font-family: var(--mono); font-size: 12px; color: var(--ink); background: var(--panel-lo); padding: 1px 6px; border: 1px solid var(--border); border-radius: 3px; }
+  .pill { display: inline-block; padding: 2px 8px; border: 1px solid var(--border); border-radius: 999px; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-dim); }
+  .pill.good { color: var(--accent); border-color: var(--accent); }
+  .pill.bad { color: var(--crit); border-color: var(--crit); }
+  .pill.warn { color: var(--warn); border-color: var(--warn); }
+  .note { font-size: 11.5px; color: var(--ink-dim); margin-top: 12px; line-height: 1.8; }
+  .incident { padding: 12px 0; border-bottom: 1px dashed var(--border); }
+  .incident:last-child { border-bottom: none; }
+  .incident .h { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+  .incident .title { color: var(--ink); font-weight: 600; }
+  .incident .meta { font-size: 10px; color: var(--ink-faint); letter-spacing: 0.1em; text-transform: uppercase; }
+  .incident .summary { margin-top: 6px; color: var(--ink-dim); font-size: 12px; }
+  .empty { color: var(--ink-faint); font-style: italic; padding: 16px 0; }
+  .opt .name { font-size: 15px; font-weight: 600; color: var(--ink); margin-top: 4px; }
   .foot { margin-top: 30px; font-size: 10px; color: var(--ink-faint); text-align: center; letter-spacing: 0.08em; }
-  @media (max-width: 600px) {
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+  @media (max-width: 760px) {
+    .wrap { padding: 22px 14px 64px; }
     .top { flex-direction: column; align-items: flex-start; gap: 12px; }
     .nav { gap: 8px 14px; width: 100%; }
     .nav a { font-size: 10.5px; }
-    .totals { grid-template-columns: repeat(2, 1fr); }
-    .bars { grid-template-columns: repeat(15, 1fr); }
+    .hero, .grid-4, .grid-3, .grid-2 { grid-template-columns: 1fr; }
+    h1 { font-size: 22px; line-height: 1.35; }
+    .hero-main { min-height: 0; padding: 18px; }
+    .bars, .calendar { grid-template-columns: repeat(15, 1fr); }
+    table, thead, tbody, tr, td, th { display: block; }
+    th { display: none; }
+    td { border-bottom: none; padding: 4px 0; text-align: left; }
+    tr { padding: 10px 0; border-bottom: 1px solid var(--border); }
+    td:first-child { font-weight: 600; margin-bottom: 4px; }
   }
   @media (max-width: 400px) {
     .brand { font-size: 13px; letter-spacing: 0.26em; }
@@ -88,78 +149,165 @@
 <body>
 <main class="wrap">
   <div class="top">
-    <div class="brand">OBSCURA<span class="v">TRANSPARENCY</span></div>
+    <div class="brand">OBSCURA<span class="v">TRUST CENTER</span></div>
     <div class="nav">
       <a href="/app">app</a>
-      <a href="/transparency.html" class="active">transparency</a>
-      <a href="/status.html">status</a>
-      <a href="/privacy.html">privacy</a>
-      <a href="/support.html">support</a>
+      <a href="#status">status</a>
+      <a href="#transparency">transparency</a>
+      <a href="#privacy">privacy</a>
+      <a href="#security">security</a>
+      <a href="#support">support</a>
     </div>
   </div>
 
-  <div class="panel">
-    <div class="label"><span>last 30 days</span><span id="generatedAt">loading…</span></div>
-    <div class="body">
-      <div class="totals">
-        <div class="cell created"><div class="lbl">created</div><div class="val" id="t-created">—</div><div class="sub">shares uploaded</div></div>
-        <div class="cell burned"><div class="lbl">burned</div><div class="val" id="t-burned">—</div><div class="sub">manually purged</div></div>
-        <div class="cell expired"><div class="lbl">expired</div><div class="val" id="t-expired">—</div><div class="sub">TTL elapsed</div></div>
-        <div class="cell exhausted"><div class="lbl">exhausted</div><div class="val" id="t-exhausted">—</div><div class="sub">downloads consumed</div></div>
+  <section class="hero" aria-labelledby="trust-title">
+    <div class="hero-main">
+      <div>
+        <h1 id="trust-title">Trust, privacy, status, and support in one place.</h1>
+        <p class="hero-copy">
+          OBSCURA is built for zero-knowledge file transfer: files encrypt in your browser, the server stores ciphertext only, and shares expire or burn after the configured limit. This page collects the operational proof, data policy, security posture, and support links people need before trusting it with anything sensitive.
+        </p>
+      </div>
+      <div class="anchor-row" aria-label="Trust center sections">
+        <a href="#status">live status</a>
+        <a href="#transparency">public metrics</a>
+        <a href="#privacy">privacy posture</a>
+        <a href="#security">security policy</a>
+        <a href="#support">support project</a>
       </div>
     </div>
-  </div>
+    <aside class="status-card" aria-labelledby="quick-state">
+      <div>
+        <div class="eyebrow" id="quick-state">current edge check</div>
+        <div class="big"><span class="dot unknown" id="liveDot"></span><span id="liveText">checking edge...</span></div>
+        <p class="note">Live GET <code>/api/health</code> from this browser. This is a reachability check, not a third-party SLA monitor.</p>
+      </div>
+      <div class="quick">
+        <div class="row"><span>checked</span><span class="v" id="checkedAt">checking...</span></div>
+        <div class="row"><span>30-day status</span><span class="v" id="uptimePct">-</span></div>
+        <div class="row"><span>public logs</span><span class="v">aggregate only</span></div>
+      </div>
+    </aside>
+  </section>
 
-  <div class="panel">
-    <div class="label"><span>shares created · daily</span><span id="peakDay">—</span></div>
+  <section class="panel" id="status" aria-labelledby="status-title">
+    <div class="label"><span id="status-title">service status</span><span id="incidentCount">loading...</span></div>
     <div class="body">
-      <div class="bars" id="bars"></div>
-      <div class="note">One bar per day, oldest left. Empty bars are days with no shares created.</div>
+      <div class="calendar" id="calendar" aria-label="Last 30 days status calendar"></div>
+      <div class="legend">
+        <span><span class="sw" style="background: var(--secure)"></span>operational</span>
+        <span><span class="sw" style="background: var(--warn)"></span>degraded</span>
+        <span><span class="sw" style="background: var(--crit)"></span>outage</span>
+      </div>
+      <div class="note">Self-reported from <a href="/incidents.json">incidents.json</a>. Days with no recorded incident are operational.</div>
+      <div id="incidents" style="margin-top: 10px;"><div class="empty">loading...</div></div>
     </div>
-  </div>
+  </section>
 
-  <div class="panel">
-    <div class="label"><span>daily breakdown</span><span></span></div>
-    <div class="body" style="overflow-x: auto;">
-      <table id="table">
-        <thead><tr><th>date (UTC)</th><th>created</th><th>burned</th><th>expired</th><th>exhausted</th></tr></thead>
-        <tbody></tbody>
-      </table>
-    </div>
-  </div>
-
-  <div class="panel">
-    <div class="label"><span>abuse reports · cumulative</span><span></span></div>
+  <section class="panel" id="transparency" aria-labelledby="transparency-title">
+    <div class="label"><span id="transparency-title">transparency report</span><span id="generatedAt">loading...</span></div>
     <div class="body">
-      <div class="abuse">
-        <div class="cell"><div class="lbl">received</div><div class="val" id="abuseReceived">—</div></div>
-        <div class="cell"><div class="lbl">actioned</div><div class="val" id="abuseActioned">—</div></div>
+      <div class="grid-4">
+        <div class="metric created"><div class="lbl">created</div><div class="val" id="t-created">-</div><div class="sub">shares uploaded</div></div>
+        <div class="metric burned"><div class="lbl">burned</div><div class="val" id="t-burned">-</div><div class="sub">manually purged</div></div>
+        <div class="metric expired"><div class="lbl">expired</div><div class="val" id="t-expired">-</div><div class="sub">TTL elapsed</div></div>
+        <div class="metric exhausted"><div class="lbl">exhausted</div><div class="val" id="t-exhausted">-</div><div class="sub">downloads consumed</div></div>
+      </div>
+      <div style="margin-top: 16px;">
+        <div class="eyebrow">shares created · daily <span id="peakDay" style="float:right;color:var(--ink-dim);">-</span></div>
+        <div class="bars" id="bars"></div>
+      </div>
+      <div style="overflow-x: auto;">
+        <table id="table">
+          <thead><tr><th>date (UTC)</th><th>created</th><th>burned</th><th>expired</th><th>exhausted</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="grid-2" style="margin-top: 16px;">
+        <div class="stat-card"><div class="lbl">abuse reports</div><div class="val" id="abuseReceived">-</div><div class="sub">received, cumulative</div></div>
+        <div class="stat-card"><div class="lbl">abuse actioned</div><div class="val" id="abuseActioned">-</div><div class="sub">purges or responses, cumulative</div></div>
       </div>
       <div class="note">
-        Reports come in via <a href="mailto:abuse@obscr.app">abuse@obscr.app</a>. We log received and actioned counts only — no contents, no reporter identity. Cumulative since 2026-05-05.
+        Counters are daily KV keys with 90-day TTL. They carry no per-share data, no IPs, and no identifiers. Raw JSON: <a href="/api/transparency">/api/transparency</a>.
       </div>
     </div>
-  </div>
+  </section>
 
-  <div class="panel">
-    <div class="label"><span>methodology</span><span></span></div>
+  <section class="panel" id="privacy" aria-labelledby="privacy-title">
+    <div class="label"><span id="privacy-title">privacy and logs</span><span>last updated 2026-06-14</span></div>
     <div class="body">
-      <div class="note" style="font-size: 12px;">
-        Counters are stored as daily KV keys (<code>stat:YYYY-MM-DD:&lt;event&gt;</code>) with a 90-day TTL. Increments are best-effort
-        read-then-write — two events landing in the same second can race and undercount by one. The counters carry no per-share data,
-        no IPs, no identifiers; you can reconstruct them from <code>git log</code> + the application source. Raw JSON: <a href="/api/transparency">/api/transparency</a>.
-        Full data policy: <a href="/privacy.html">privacy</a>.
+      <div class="grid-3">
+        <div class="stat-card"><div class="lbl">server sees</div><div class="val">ciphertext</div><div class="sub">R2 blob, total ciphertext size, and short-lived KV metadata.</div></div>
+        <div class="stat-card"><div class="lbl">server never sees</div><div class="val">keys</div><div class="sub">URL fragments and passphrases do not go to the Worker.</div></div>
+        <div class="stat-card"><div class="lbl">accounts</div><div class="val">none</div><div class="sub">No email, identity, cookies, or user profile required.</div></div>
+      </div>
+      <h2>what OBSCURA stores</h2>
+      <ul>
+        <li><strong>Ciphertext.</strong> Stored in Cloudflare R2 under a random 16-hex-character ID until expiry, burn, or download exhaustion.</li>
+        <li><strong>Per-share metadata.</strong> Stored in KV: expiry time, remaining downloads, total ciphertext size, and created timestamp.</li>
+        <li><strong>Aggregate counters.</strong> Daily totals for created, burned, expired, and exhausted shares. No identifiers.</li>
+      </ul>
+      <h2>what OBSCURA does not store</h2>
+      <ul>
+        <li><strong>Plaintext.</strong> Encryption and decryption happen in the browser.</li>
+        <li><strong>Encryption keys.</strong> Normal-mode keys live in URL fragments; passphrase mode wraps the data key client-side.</li>
+        <li><strong>Application access logs.</strong> The Worker does not write per-request logs for upload, download, or burn routes.</li>
+      </ul>
+      <p class="note">
+        Cloudflare can still retain platform analytics and security events. A Cloudflare account administrator could correlate IPs to share IDs inside Cloudflare's own retention window, even though the app does not log that itself. Full canonical policy: <a href="https://github.com/dgpugliese/obscura/blob/main/PRIVACY.md">PRIVACY.md</a>.
+      </p>
+    </div>
+  </section>
+
+  <section class="panel" id="security" aria-labelledby="security-title">
+    <div class="label"><span id="security-title">security posture</span><span>public source</span></div>
+    <div class="body">
+      <div class="grid-3">
+        <div class="stat-card"><div class="lbl">crypto</div><div class="val">WebCrypto</div><div class="sub">AES-256-GCM with optional Argon2id passphrase wrap.</div></div>
+        <div class="stat-card"><div class="lbl">audit</div><div class="val">not yet</div><div class="sub">No independent third-party security audit has been completed.</div></div>
+        <div class="stat-card"><div class="lbl">regulated data</div><div class="val">no</div><div class="sub">No HIPAA, PCI, CJIS, classified, BAA, SLA, or key recovery posture.</div></div>
+      </div>
+      <p class="note">
+        Report vulnerabilities to <a href="mailto:security@obscr.app">security@obscr.app</a>. Scope and response expectations are documented in <a href="https://github.com/dgpugliese/obscura/blob/main/SECURITY.md">SECURITY.md</a>. Abuse reports go to <a href="mailto:abuse@obscr.app">abuse@obscr.app</a>.
+      </p>
+    </div>
+  </section>
+
+  <section class="panel" id="support" aria-labelledby="support-title">
+    <div class="label"><span id="support-title">support</span><span>free and open source</span></div>
+    <div class="body">
+      <div class="grid-2">
+        <div class="opt">
+          <div class="lbl">tip</div>
+          <div class="name">Buy Me a Coffee</div>
+          <div class="desc">One-off support for Cloudflare egress, domain renewal, future security review, and project upkeep.</div>
+          <div style="margin-top: 10px;">
+            <a href="https://buymeacoffee.com/dgpugliese" rel="noopener" target="_blank" aria-label="Buy Me a Coffee - buymeacoffee.com/dgpugliese">
+              <img src="/bmc-button.png" alt="Buy Me a Coffee" width="210" height="59" style="display:block;border-radius:4px;max-width:100%;height:auto;" />
+            </a>
+          </div>
+        </div>
+        <div class="opt">
+          <div class="lbl">free ways to help</div>
+          <div class="name">Star, share, audit</div>
+          <div class="desc">Star the repo, share <a href="https://obscr.app">obscr.app</a>, file issues, or read the crypto path and tell us what breaks.</div>
+          <div style="margin-top: 12px;"><a class="btn" href="https://github.com/dgpugliese/obscura" rel="noopener" target="_blank">open github</a></div>
+        </div>
+      </div>
+      <div class="note">
+        Donations happen on Buy Me a Coffee and Stripe. OBSCURA does not link donations to shares; the app has no accounts and no donation identity surface.
       </div>
     </div>
-  </div>
+  </section>
 
   <div class="foot">
-    <a href="/api/transparency">raw JSON</a> ·
-    <a href="https://github.com/dgpugliese/Obsecura">repo</a> ·
-    <a href="/support.html">support</a>
+    <a href="/api/transparency">raw transparency JSON</a> ·
+    <a href="/incidents.json">incidents JSON</a> ·
+    <a href="https://github.com/dgpugliese/obscura">repo</a>
   </div>
-</div>
+</main>
 
+<script src="/status.js"></script>
 <script src="/transparency.js"></script>
 </body>
 </html>

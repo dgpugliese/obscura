@@ -9,8 +9,8 @@
 <meta property="og:title" content="OBSCURA — zero-knowledge file transfer" />
 <meta property="og:description" content="Files encrypted in your browser. The server never sees your keys." />
 <meta property="og:type" content="website" />
-<meta property="og:image" content="/favicon.svg" />
-<meta name="twitter:card" content="summary" />
+<meta property="og:image" content="/marketing/screenshots/obscr-cover-x.png" />
+<meta name="twitter:card" content="summary_large_image" />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -120,10 +120,7 @@
     <div class="brand">OBSCURA<span class="v">v0.1.1</span></div>
     <div class="nav">
       <a href="/app">app</a>
-      <a href="/transparency.html">transparency</a>
-      <a href="/status.html">status</a>
-      <a href="/privacy.html">privacy</a>
-      <a href="/support.html">support</a>
+      <a href="/transparency.html">trust center</a>
     </div>
   </div>
 
@@ -158,7 +155,7 @@
         <div class="step">
           <div class="n"><span class="num">03</span> · burn</div>
           <div class="t">TTL or read-count</div>
-          <div class="d">Configurable expiry (up to <strong>7 days</strong>) and download cap (1–100). When either fires, R2 is purged and KV forgets. Manual burn anytime.</div>
+          <div class="d">Configurable expiry (up to <strong>7 days</strong>) and download cap (<strong>1, 3, 5, or 10</strong>). When either fires, R2 is purged and KV forgets. Manual burn anytime.</div>
         </div>
       </div>
     </div>
@@ -174,7 +171,7 @@
             <li>Opaque ciphertext bytes</li>
             <li>Total ciphertext size</li>
             <li>Aggregate daily counters</li>
-            <li>Cloudflare-side IP logs (see <a href="/privacy.html">privacy</a>)</li>
+            <li>Cloudflare-side IP logs (see <a href="/transparency.html#privacy">Trust Center</a>)</li>
           </ul>
         </div>
         <div class="col bad">
@@ -198,7 +195,20 @@
         <span class="chip"><strong>Argon2id</strong> · m=64MiB · t=3</span>
         <span class="chip">Cloudflare <strong>Workers</strong> + R2 + KV</span>
         <span class="chip">React 18 · SRI-pinned</span>
-        <span class="chip"><strong>MIT</strong> · <a href="https://github.com/dgpugliese/Obsecura">github</a></span>
+        <span class="chip"><strong>MIT</strong> · <a href="https://github.com/dgpugliese/obscura">github</a></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="label"><span>current public limits</span><span>no accounts</span></div>
+    <div class="body">
+      <div class="chips">
+        <span class="chip"><strong>File size</strong> · 50 MB design ceiling · 64 MiB hard cap</span>
+        <span class="chip"><strong>Expiry</strong> · 1 hour to 7 days</span>
+        <span class="chip"><strong>Downloads</strong> · 1 / 3 / 5 / 10</span>
+        <span class="chip"><strong>Audit</strong> · public source, no third-party audit</span>
+        <span class="chip"><strong>Regulated data</strong> · not supported</span>
       </div>
     </div>
   </div>
@@ -207,18 +217,15 @@
     <div class="label"><span>disclaimer</span><span>read before relying on it</span></div>
     <div class="body">
       <div class="note">
-        OBSCURA has <strong>not been independently security-audited</strong>, has no SLA or key-recovery, and is <strong>not appropriate for regulated data</strong> (HIPAA / PCI / CJIS / classified). Read the <a href="https://github.com/dgpugliese/Obsecura/blob/main/DISCLAIMER.md">DISCLAIMER</a> and <a href="/privacy.html">privacy policy</a> before using it for anything that matters.
+        OBSCURA has <strong>not been independently security-audited</strong>, has no SLA or key-recovery, and is <strong>not appropriate for regulated data</strong> (HIPAA / PCI / CJIS / classified). Read the <a href="https://github.com/dgpugliese/obscura/blob/main/DISCLAIMER.md">DISCLAIMER</a> and <a href="/transparency.html">Trust Center</a> before using it for anything that matters.
       </div>
     </div>
   </div>
 
   <div class="foot">
     <a href="/app">launch</a> ·
-    <a href="/transparency.html">transparency</a> ·
-    <a href="/status.html">status</a> ·
-    <a href="/privacy.html">privacy</a> ·
-    <a href="/support.html">support</a> ·
-    <a href="https://github.com/dgpugliese/Obsecura">github</a>
+    <a href="/transparency.html">trust center</a> ·
+    <a href="https://github.com/dgpugliese/obscura">github</a>
   </div>
 
 </main>

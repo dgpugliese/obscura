@@ -1,9 +1,12 @@
 .git/
 .gitignore
 .assetsignore
+.dockerignore
 .claude/
 .wrangler/
 .dev.vars
+Dockerfile
+docker-compose.yml
 node_modules/
 worker/
 src/
