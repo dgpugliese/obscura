@@ -681,7 +681,7 @@ function fmtMs(ms) {
   return (ms / 1000).toFixed(2) + "s";
 }
 
-function fmtThroughput(bytes, ms) {
+export function fmtThroughput(bytes, ms) {
   if (!bytes || !ms) return "—";
   const mbps = bytes / (1024 * 1024) / (ms / 1000);
   if (mbps >= 100) return mbps.toFixed(0) + " MB/s";
