@@ -54,7 +54,7 @@ const PROD_ALLOWED_ORIGINS = new Set([
   "https://www.obscr.app",
 ]);
 
-function originAllowed(request) {
+export function originAllowed(request) {
   const origin = request.headers.get("origin");
   const requestUrl = new URL(request.url);
   if (!origin) {
