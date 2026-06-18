@@ -449,7 +449,7 @@ const ARGON2_PARAMS = { mem: 65536, time: 3, parallelism: 1, hashLen: 32 };
 // per word ≈ log2(110) ≈ 6.78 bits; the default `word-word-NN-word` form is
 // ~26 bits, then argon2id stretches each guess by ~1s on consumer hardware.
 // Users can edit/extend the passphrase for stronger secrets.
-const PASSPHRASE_WORDS = [
+export const PASSPHRASE_WORDS = [
   "amber","anchor","axiom","beacon","blaze","bramble","brick","candle","canyon","cedar",
   "cipher","cobalt","copper","coral","crane","crimson","crystal","dahlia","dawn","delta",
   "dune","ember","falcon","fern","forge","frost","garnet","glade","granite","harbor",
@@ -466,7 +466,7 @@ const PASSPHRASE_WORDS = [
 // Unbiased uniform integer in [0, max) backed by crypto.getRandomValues.
 // Math.random is not a CSPRNG; using it for passphrase material would let an
 // attacker who learns one passphrase predict future ones from V8 RNG state.
-function secureRandInt(max) {
+export function secureRandInt(max) {
   if (max <= 0 || max > 0x100000000) throw new Error("secureRandInt out of range");
   const limit = Math.floor(0x100000000 / max) * max;
   const buf = new Uint32Array(1);
@@ -476,7 +476,7 @@ function secureRandInt(max) {
   }
 }
 
-function generatePassphrase() {
+export function generatePassphrase() {
   const w = () => PASSPHRASE_WORDS[secureRandInt(PASSPHRASE_WORDS.length)];
   const n = () => String(secureRandInt(100)).padStart(2, "0");
   return [w(), w(), n(), w()].join("-");
