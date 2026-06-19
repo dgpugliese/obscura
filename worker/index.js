@@ -74,73 +74,83 @@ function originAllowed(request) {
 
 export default {
   async fetch(request, env, ctx) {
-    const url = new URL(request.url);
+    try {
+      const url = new URL(request.url);
 
-    if (url.pathname === "/api/health") {
-      return Response.json({ ok: true, ts: Date.now() });
-    }
+      if (url.pathname === "/api/health") {
+        return Response.json({ ok: true, ts: Date.now() });
+      }
 
-    if (url.pathname === "/api/transparency") {
-      return handleTransparency(env);
-    }
+      if (url.pathname === "/api/transparency") {
+        return await handleTransparency(env);
+      }
 
-    if (url.pathname === "/api/upload" && request.method === "POST") {
-      return handleUpload(request, env, ctx);
-    }
+      if (url.pathname === "/api/upload" && request.method === "POST") {
+        return await handleUpload(request, env, ctx);
+      }
 
-    const m = url.pathname.match(/^\/api\/d\/([a-f0-9]{16})$/);
-    if (m) {
-      const id = m[1];
-      if (request.method === "GET") return handleDownload(id, env, ctx);
-      if (request.method === "HEAD") return handleHead(id, env);
-      if (request.method === "DELETE") return handleManualPurge(id, env, ctx);
-      return new Response("method not allowed", { status: 405 });
-    }
+      const m = url.pathname.match(/^\/api\/d\/([a-f0-9]{16})$/);
+      if (m) {
+        const id = m[1];
+        if (request.method === "GET") return await handleDownload(id, env, ctx);
+        if (request.method === "HEAD") return await handleHead(id, env);
+        if (request.method === "DELETE") return await handleManualPurge(id, env, ctx);
+        return new Response("method not allowed", { status: 405 });
+      }
 
-    if (url.pathname.startsWith("/api/")) {
-      return jerr(404, "not found");
-    }
+      if (url.pathname.startsWith("/api/")) {
+        return jerr(404, "not found");
+      }
 
-    // status.obscr.app pins the root to /status. We let the asset binding
-    // (which html_handling rewrites .html → bare path) handle the canonical
-    // form by re-issuing as /status and following one redirect inline, so
-    // the visitor's URL bar reads status.obscr.app/status without a flash.
-    // The main domain doesn't need any root rewrite — the assets binding
-    // serves index.html at / automatically.
-    const host = url.hostname;
-    const isRoot = url.pathname === "/" || url.pathname === "";
-    if (isRoot && host === "status.obscr.app") {
-      const u = new URL(request.url);
-      u.pathname = "/status";
-      const res = await env.ASSETS.fetch(new Request(u.toString(), { headers: request.headers }));
-      if (res.status === 200) return withSecurityHeaders(res);
-      // Fallback: follow one redirect if assets binding emits a 3xx.
-      if (res.status >= 300 && res.status < 400) {
-        const loc = res.headers.get("location");
-        if (loc) {
-          const followed = await env.ASSETS.fetch(new Request(new URL(loc, u).toString(), { headers: request.headers }));
-          if (followed.status === 200) return withSecurityHeaders(followed);
+      // status.obscr.app pins the root to /status. We let the asset binding
+      // (which html_handling rewrites .html → bare path) handle the canonical
+      // form by re-issuing as /status and following one redirect inline, so
+      // the visitor's URL bar reads status.obscr.app/status without a flash.
+      // The main domain doesn't need any root rewrite — the assets binding
+      // serves index.html at / automatically.
+      const host = url.hostname;
+      const isRoot = url.pathname === "/" || url.pathname === "";
+      if (isRoot && host === "status.obscr.app") {
+        const u = new URL(request.url);
+        u.pathname = "/status";
+        const res = await env.ASSETS.fetch(new Request(u.toString(), { headers: request.headers }));
+        if (res.status === 200) return withSecurityHeaders(res);
+        // Fallback: follow one redirect if assets binding emits a 3xx.
+        if (res.status >= 300 && res.status < 400) {
+          const loc = res.headers.get("location");
+          if (loc) {
+            const followed = await env.ASSETS.fetch(new Request(new URL(loc, u).toString(), { headers: request.headers }));
+            if (followed.status === 200) return withSecurityHeaders(followed);
+          }
         }
       }
+
+      const res = await env.ASSETS.fetch(request);
+
+      // Replace the asset binding's bare 404 with our styled page. ASSETS
+      // returns 404 for any path that doesn't match a file in the bundle.
+      if (res.status === 404) {
+        return await serveNotFound(request, env);
+      }
+
+      // Apply security headers to HTML responses; pass everything else through
+      // untouched so binary assets keep their content-type.
+      const ct = res.headers.get("content-type") || "";
+      if (ct.startsWith("text/html")) return withSecurityHeaders(res);
+      return res;
+    } catch (error) {
+      // Catch unhandled exceptions to avoid leaking internals
+      console.error("Worker exception:", error);
+      return jerr(500, "Internal Server Error");
     }
-
-    const res = await env.ASSETS.fetch(request);
-
-    // Replace the asset binding's bare 404 with our styled page. ASSETS
-    // returns 404 for any path that doesn't match a file in the bundle.
-    if (res.status === 404) {
-      return serveNotFound(request, env);
-    }
-
-    // Apply security headers to HTML responses; pass everything else through
-    // untouched so binary assets keep their content-type.
-    const ct = res.headers.get("content-type") || "";
-    if (ct.startsWith("text/html")) return withSecurityHeaders(res);
-    return res;
   },
 
   async scheduled(event, env, ctx) {
-    ctx.waitUntil(sweepOrphans(env));
+    ctx.waitUntil(
+      sweepOrphans(env).catch((error) => {
+        console.error("Scheduled worker exception:", error);
+      })
+    );
   },
 };
 

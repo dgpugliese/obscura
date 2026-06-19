@@ -1,0 +1,4 @@
+## 2024-06-19 - [Worker Top-Level Exception Handling]
+**Vulnerability:** The Cloudflare worker's main `fetch` handler and `scheduled` handler didn't wrap their logic in top-level `try...catch` blocks. Unhandled exceptions could potentially cause a worker to crash or result in error messages leaking stack traces to the client, leading to an Information Exposure vulnerability.
+**Learning:** For serverless edge architectures where logic runs inside events (`fetch`/`scheduled`), all execution paths must defensively handle exceptions, especially to prevent leakage of internal details when Cloudflare serves an error response.
+**Prevention:** Wrap edge handler functions (`fetch`, `scheduled`) with a global `try...catch` block. Log the error internally and return a generic 500 error structure so it fails securely without exposing data.
