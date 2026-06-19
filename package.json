@@ -11,10 +11,12 @@
     "predev:docker": "npm run build",
     "dev:docker": "wrangler dev --ip 0.0.0.0 --port 8787 --local",
     "predeploy": "npm run build:min",
-    "deploy": "wrangler deploy"
+    "deploy": "wrangler deploy",
+    "test": "vitest run"
   },
   "devDependencies": {
     "esbuild": "^0.28.0",
+    "vitest": "^4.1.8",
     "wrangler": "^4.90.0"
   }
 }
