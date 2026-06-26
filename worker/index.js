@@ -402,7 +402,7 @@ function clampInt(raw, min, max, fallback) {
   return Math.max(min, Math.min(max, n));
 }
 
-function allowedInt(raw, allowed, fallback) {
+export function allowedInt(raw, allowed, fallback) {
   const n = parseInt(raw, 10);
   return allowed.includes(n) ? n : fallback;
 }
