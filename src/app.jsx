@@ -484,7 +484,10 @@ function generatePassphrase() {
 
 function b64uEncode(bytes) {
   let s = "";
-  for (let i = 0; i < bytes.length; i++) s += String.fromCharCode(bytes[i]);
+  const CHUNK_SIZE = 65535;
+  for (let i = 0; i < bytes.length; i += CHUNK_SIZE) {
+    s += String.fromCharCode.apply(null, bytes.subarray(i, i + CHUNK_SIZE));
+  }
   return btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 }
 function b64uDecode(s) {
