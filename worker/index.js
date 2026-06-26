@@ -307,10 +307,18 @@ async function sweepOrphans(env) {
   let scanned = 0;
   do {
     const page = await env.BLOBS.list({ limit: 200, cursor });
-    for (const obj of page.objects) {
-      scanned++;
-      const meta = await env.META.get(obj.key);
-      if (!meta) await env.BLOBS.delete(obj.key);
+    const batchSize = 50;
+    for (let i = 0; i < page.objects.length; i += batchSize) {
+      const chunk = page.objects.slice(i, i + batchSize);
+      scanned += chunk.length;
+
+      const metas = await Promise.all(chunk.map(obj => env.META.get(obj.key)));
+
+      const deletions = [];
+      for (let j = 0; j < chunk.length; j++) {
+        if (!metas[j]) deletions.push(env.BLOBS.delete(chunk[j].key));
+      }
+      if (deletions.length > 0) await Promise.all(deletions);
     }
     cursor = page.truncated ? page.cursor : undefined;
   } while (cursor && scanned < 2000); // safety cap per run
