@@ -418,3 +418,4 @@ function randomHexId(bytes) {
 function jerr(status, message) {
   return Response.json({ error: message }, { status });
 }
+export { allowedInt };
