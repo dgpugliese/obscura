@@ -29,9 +29,11 @@ const theme = {
 const HEX = "0123456789ABCDEF";
 const CIPHER_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789#$%&*+=<>/\\|".split("");
 
+// Use CSPRNG for security applications even in cosmetic features
 function randHex(len = 4) {
+  const bytes = window.crypto.getRandomValues(new Uint8Array(len));
   let s = "";
-  for (let i = 0; i < len; i++) s += HEX[Math.floor(Math.random() * 16)];
+  for (let i = 0; i < len; i++) s += HEX[bytes[i] % 16];
   return s;
 }
 
