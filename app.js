@@ -703,10 +703,10 @@ function hexLine(bytes) {
   }
   return s;
 }
-const BUILD_SHA = true ? "7f4be5c" : "dev";
+const BUILD_SHA = true ? "4e5cc1d" : "dev";
 const MARKETING_MODE = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("marketing") === "1";
-const BUILD_TIME = true ? "2026-06-15T02:04:01Z" : "";
-const BUILD_VERSION = true ? "v0.1.1" : "dev";
+const BUILD_TIME = true ? "2026-06-26T03:53:46Z" : "";
+const BUILD_VERSION = true ? "dev" : "dev";
 const DOWNLOAD_OPTIONS = [1, 3, 5, 10];
 function useNarrow(threshold = 720) {
   const [narrow, setNarrow] = useState(() => typeof window !== "undefined" && window.innerWidth < threshold);
