@@ -1,0 +1,4 @@
+## 2026-06-26 - [Insecure Randomness for Cosmetic Features]
+**Vulnerability:** [Insecure Randomness (`Math.random()`) used for generating random characters in the `randHex` function, even for cosmetic features.]
+**Learning:** [In a security application context, even cosmetic features should avoid insecure random number generation mechanisms to prevent potential predictability and maintain a strong security posture across the entire application.]
+**Prevention:** [Always use a Cryptographically Secure Pseudo-Random Number Generator (CSPRNG) like `window.crypto.getRandomValues()` when generating random values, regardless of whether the output is for critical security material or simply cosmetic features.]
