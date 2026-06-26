@@ -2528,4 +2528,8 @@ function Entry() {
   return <App />;
 }
 
-ReactDOM.createRoot(document.getElementById("root")).render(<Entry />);
+if (typeof process === 'undefined' || process.env.NODE_ENV !== 'test') {
+  ReactDOM.createRoot(document.getElementById("root")).render(<Entry />);
+}
+
+export { shannonEntropy };
