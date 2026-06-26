@@ -729,11 +729,6 @@ function useNarrow(threshold = 720) {
   return narrow;
 }
 
-function clampNum(n, min, max, fallback) {
-  if (!Number.isFinite(n)) return fallback;
-  return Math.max(min, Math.min(max, n));
-}
-
 function allowedDownloadCount(n, fallback = 3) {
   return DOWNLOAD_OPTIONS.includes(n) ? n : fallback;
 }
