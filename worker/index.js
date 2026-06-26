@@ -151,7 +151,7 @@ export default {
 const MIN_OBS1 = 32;
 const MIN_OBS2 = 108;
 
-async function handleUpload(request, env, ctx) {
+export async function handleUpload(request, env, ctx) {
   if (!originAllowed(request)) return jerr(403, "forbidden origin");
 
   const ttl = clampInt(request.headers.get("X-Obscura-TTL"), 1, parseInt(env.MAX_TTL_HOURS, 10) || 168, 24);
