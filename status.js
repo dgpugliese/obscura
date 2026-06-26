@@ -64,7 +64,8 @@
   document.getElementById("uptimePct").textContent = upPct.toFixed(3) + "% uptime";
 
   const incHost = document.getElementById("incidents");
-  incHost.innerHTML = "";
+  // Security fix: Use textContent instead of innerHTML to prevent XSS
+  incHost.textContent = "";
   if (incidents.length === 0) {
     const empty = document.createElement("div");
     empty.className = "empty";
