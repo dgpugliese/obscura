@@ -267,7 +267,8 @@ async function serveNotFound(request, env) {
   // redirect by re-issuing against the resolved Location, in case future
   // assets-binding behavior differs.
   const tryPaths = ["/404", "/404.html"];
-  for (const path of tryPaths) {
+
+  const fetchPromises = tryPaths.map(async (path) => {
     const u = new URL(request.url);
     u.pathname = path;
     const res = await env.ASSETS.fetch(new Request(u.toString(), { headers: request.headers }));
@@ -289,7 +290,14 @@ async function serveNotFound(request, env) {
         }
       }
     }
+    return null;
+  });
+
+  const results = await Promise.all(fetchPromises);
+  for (const res of results) {
+    if (res) return res;
   }
+
   return withSecurityHeaders(new Response("not found\n", {
     status: 404,
     headers: { "content-type": "text/plain; charset=utf-8" },
