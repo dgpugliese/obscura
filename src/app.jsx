@@ -629,9 +629,7 @@ async function decryptBlobV2(blob, passphrase) {
 // ============================================================
 async function sha256Hex(bytes) {
   const h = new Uint8Array(await crypto.subtle.digest("SHA-256", bytes));
-  let s = "";
-  for (let i = 0; i < h.length; i++) s += h[i].toString(16).padStart(2, "0");
-  return s;
+  return Array.from(h).map((x) => x.toString(16).padStart(2, "0")).join("");
 }
 
 // Format the first 12 hex chars of a SHA-256 as XX:XX:XX:XX:XX:XX over three
