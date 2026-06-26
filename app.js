@@ -503,8 +503,14 @@ function generatePassphrase() {
   return [w(), w(), n(), w()].join("-");
 }
 function b64uEncode(bytes) {
+  const CHUNK_SIZE = 8192;
+  if (bytes.length <= CHUNK_SIZE) {
+    return btoa(String.fromCharCode.apply(null, bytes)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  }
   let s = "";
-  for (let i = 0; i < bytes.length; i++) s += String.fromCharCode(bytes[i]);
+  for (let i = 0; i < bytes.length; i += CHUNK_SIZE) {
+    s += String.fromCharCode.apply(null, bytes.subarray(i, i + CHUNK_SIZE));
+  }
   return btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 }
 function b64uDecode(s) {
@@ -703,10 +709,10 @@ function hexLine(bytes) {
   }
   return s;
 }
-const BUILD_SHA = true ? "7f4be5c" : "dev";
+const BUILD_SHA = true ? "4e5cc1d" : "dev";
 const MARKETING_MODE = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("marketing") === "1";
-const BUILD_TIME = true ? "2026-06-15T02:04:01Z" : "";
-const BUILD_VERSION = true ? "v0.1.1" : "dev";
+const BUILD_TIME = true ? "2026-06-26T03:06:03Z" : "";
+const BUILD_VERSION = true ? "dev" : "dev";
 const DOWNLOAD_OPTIONS = [1, 3, 5, 10];
 function useNarrow(threshold = 720) {
   const [narrow, setNarrow] = useState(() => typeof window !== "undefined" && window.innerWidth < threshold);
