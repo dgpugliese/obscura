@@ -105,32 +105,6 @@ function HexDump({ rows = 6, cols = 16, speed = 80, color, dim, paused = false }
   );
 }
 
-function EntropyBar({ width = 220, height = 38, color, dim, speed = 90, paused = false }) {
-  const [seed, setSeed] = useState(0);
-  useEffect(() => {
-    if (paused) return;
-    const id = setInterval(() => setSeed((x) => x + 1), speed);
-    return () => clearInterval(id);
-  }, [speed, paused]);
-  const bars = useMemo(() => {
-    const n = 56;
-    return Array.from({ length: n }, () => 0.25 + Math.random() * 0.75);
-  }, [seed]);
-  const bw = (width - (bars.length - 1) * 2) / bars.length;
-  return (
-    <svg width={width} height={height} style={{ display: "block" }}>
-      {bars.map((v, i) => {
-        const h = Math.max(2, v * height);
-        return (
-          <rect key={i} x={i * (bw + 2)} y={height - h} width={bw} height={h}
-            fill={i % 6 === 0 ? color : dim}
-            opacity={i % 6 === 0 ? 0.95 : 0.55} />
-        );
-      })}
-    </svg>
-  );
-}
-
 function Clock({ color, style }) {
   const [t, setT] = useState(() => new Date());
   useEffect(() => {
