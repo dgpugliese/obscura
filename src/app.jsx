@@ -483,8 +483,14 @@ function generatePassphrase() {
 }
 
 function b64uEncode(bytes) {
+  const CHUNK_SIZE = 8192;
+  if (bytes.length <= CHUNK_SIZE) {
+    return btoa(String.fromCharCode.apply(null, bytes)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  }
   let s = "";
-  for (let i = 0; i < bytes.length; i++) s += String.fromCharCode(bytes[i]);
+  for (let i = 0; i < bytes.length; i += CHUNK_SIZE) {
+    s += String.fromCharCode.apply(null, bytes.subarray(i, i + CHUNK_SIZE));
+  }
   return btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 }
 function b64uDecode(s) {
