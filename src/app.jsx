@@ -466,7 +466,7 @@ const PASSPHRASE_WORDS = [
 // Unbiased uniform integer in [0, max) backed by crypto.getRandomValues.
 // Math.random is not a CSPRNG; using it for passphrase material would let an
 // attacker who learns one passphrase predict future ones from V8 RNG state.
-function secureRandInt(max) {
+export function secureRandInt(max) {
   if (max <= 0 || max > 0x100000000) throw new Error("secureRandInt out of range");
   const limit = Math.floor(0x100000000 / max) * max;
   const buf = new Uint32Array(1);
@@ -476,18 +476,18 @@ function secureRandInt(max) {
   }
 }
 
-function generatePassphrase() {
+export function generatePassphrase() {
   const w = () => PASSPHRASE_WORDS[secureRandInt(PASSPHRASE_WORDS.length)];
   const n = () => String(secureRandInt(100)).padStart(2, "0");
   return [w(), w(), n(), w()].join("-");
 }
 
-function b64uEncode(bytes) {
+export function b64uEncode(bytes) {
   let s = "";
   for (let i = 0; i < bytes.length; i++) s += String.fromCharCode(bytes[i]);
   return btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 }
-function b64uDecode(s) {
+export function b64uDecode(s) {
   s = s.replace(/-/g, "+").replace(/_/g, "/");
   while (s.length % 4) s += "=";
   const bin = atob(s);
@@ -559,7 +559,7 @@ async function decryptBlob(blob, key) {
   return new Uint8Array(await crypto.subtle.decrypt({ name: "AES-GCM", iv }, key, ct));
 }
 
-function blobMagic(blob) {
+export function blobMagic(blob) {
   if (blob.length < 4) return null;
   for (let i = 0; i < 4; i++) {
     if (blob[i] === MAGIC[i]) continue;
@@ -637,7 +637,7 @@ async function sha256Hex(bytes) {
 // Format the first 12 hex chars of a SHA-256 as XX:XX:XX:XX:XX:XX over three
 // rows. Both sender and recipient compute it from the same data key, so it's
 // usable as an OOB verification token.
-function fingerprintRows(hex) {
+export function fingerprintRows(hex) {
   const top = hex.slice(0, 12).toUpperCase();
   const pair = (s, i) => s.slice(i, i + 2);
   return [
@@ -651,7 +651,7 @@ function fingerprintRows(hex) {
 // a few thousandths of 8.0 — making the displayed number a real signal of
 // "the encryption produced ciphertext that looks uniform" instead of a
 // hardcoded 7.998.
-function shannonEntropy(bytes) {
+export function shannonEntropy(bytes) {
   if (!bytes || !bytes.length) return 0;
   // Sample at most 64 KiB so we don't stall the main thread on big payloads.
   const SAMPLE = 65536;
@@ -674,28 +674,28 @@ function shannonEntropy(bytes) {
   return h;
 }
 
-function fmtMs(ms) {
+export function fmtMs(ms) {
   if (ms == null) return "—";
   if (ms < 1) return "<1ms";
   if (ms < 1000) return Math.round(ms) + "ms";
   return (ms / 1000).toFixed(2) + "s";
 }
 
-function fmtThroughput(bytes, ms) {
+export function fmtThroughput(bytes, ms) {
   if (!bytes || !ms) return "—";
   const mbps = bytes / (1024 * 1024) / (ms / 1000);
   if (mbps >= 100) return mbps.toFixed(0) + " MB/s";
   return mbps.toFixed(1) + " MB/s";
 }
 
-function fmtBytes(b) {
+export function fmtBytes(b) {
   if (b == null) return "—";
   if (b < 1024) return b + " B";
   if (b < 1024 * 1024) return (b / 1024).toFixed(1) + " KB";
   return (b / 1024 / 1024).toFixed(2) + " MB";
 }
 
-function hexLine(bytes) {
+export function hexLine(bytes) {
   if (!bytes || !bytes.length) return "";
   let s = "";
   for (let i = 0; i < bytes.length; i++) {
@@ -729,12 +729,12 @@ function useNarrow(threshold = 720) {
   return narrow;
 }
 
-function clampNum(n, min, max, fallback) {
+export function clampNum(n, min, max, fallback) {
   if (!Number.isFinite(n)) return fallback;
   return Math.max(min, Math.min(max, n));
 }
 
-function allowedDownloadCount(n, fallback = 3) {
+export function allowedDownloadCount(n, fallback = 3) {
   return DOWNLOAD_OPTIONS.includes(n) ? n : fallback;
 }
 
@@ -2528,4 +2528,6 @@ function Entry() {
   return <App />;
 }
 
-ReactDOM.createRoot(document.getElementById("root")).render(<Entry />);
+if (typeof process === "undefined" || process.env.NODE_ENV !== "test") {
+  ReactDOM.createRoot(document.getElementById("root")).render(<Entry />);
+}

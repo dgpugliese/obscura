@@ -488,7 +488,7 @@ const PASSPHRASE_WORDS = [
   "zephyr",
   "zinc"
 ];
-function secureRandInt(max) {
+export function secureRandInt(max) {
   if (max <= 0 || max > 4294967296) throw new Error("secureRandInt out of range");
   const limit = Math.floor(4294967296 / max) * max;
   const buf = new Uint32Array(1);
@@ -497,17 +497,17 @@ function secureRandInt(max) {
     if (buf[0] < limit) return buf[0] % max;
   }
 }
-function generatePassphrase() {
+export function generatePassphrase() {
   const w = () => PASSPHRASE_WORDS[secureRandInt(PASSPHRASE_WORDS.length)];
   const n = () => String(secureRandInt(100)).padStart(2, "0");
   return [w(), w(), n(), w()].join("-");
 }
-function b64uEncode(bytes) {
+export function b64uEncode(bytes) {
   let s = "";
   for (let i = 0; i < bytes.length; i++) s += String.fromCharCode(bytes[i]);
   return btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 }
-function b64uDecode(s) {
+export function b64uDecode(s) {
   s = s.replace(/-/g, "+").replace(/_/g, "/");
   while (s.length % 4) s += "=";
   const bin = atob(s);
@@ -578,7 +578,7 @@ async function decryptBlob(blob, key) {
   const ct = blob.subarray(MAGIC.length + 12);
   return new Uint8Array(await crypto.subtle.decrypt({ name: "AES-GCM", iv }, key, ct));
 }
-function blobMagic(blob) {
+export function blobMagic(blob) {
   if (blob.length < 4) return null;
   for (let i = 0; i < 4; i++) {
     if (blob[i] === MAGIC[i]) continue;
@@ -647,7 +647,7 @@ async function sha256Hex(bytes) {
   for (let i = 0; i < h.length; i++) s += h[i].toString(16).padStart(2, "0");
   return s;
 }
-function fingerprintRows(hex) {
+export function fingerprintRows(hex) {
   const top = hex.slice(0, 12).toUpperCase();
   const pair = (s, i) => s.slice(i, i + 2);
   return [
@@ -655,7 +655,7 @@ function fingerprintRows(hex) {
     `${pair(top, 6)}:${pair(top, 8)}:${pair(top, 10)}`
   ];
 }
-function shannonEntropy(bytes) {
+export function shannonEntropy(bytes) {
   if (!bytes || !bytes.length) return 0;
   const SAMPLE = 65536;
   let view = bytes;
@@ -676,25 +676,25 @@ function shannonEntropy(bytes) {
   }
   return h;
 }
-function fmtMs(ms) {
+export function fmtMs(ms) {
   if (ms == null) return "\u2014";
   if (ms < 1) return "<1ms";
   if (ms < 1e3) return Math.round(ms) + "ms";
   return (ms / 1e3).toFixed(2) + "s";
 }
-function fmtThroughput(bytes, ms) {
+export function fmtThroughput(bytes, ms) {
   if (!bytes || !ms) return "\u2014";
   const mbps = bytes / (1024 * 1024) / (ms / 1e3);
   if (mbps >= 100) return mbps.toFixed(0) + " MB/s";
   return mbps.toFixed(1) + " MB/s";
 }
-function fmtBytes(b) {
+export function fmtBytes(b) {
   if (b == null) return "\u2014";
   if (b < 1024) return b + " B";
   if (b < 1024 * 1024) return (b / 1024).toFixed(1) + " KB";
   return (b / 1024 / 1024).toFixed(2) + " MB";
 }
-function hexLine(bytes) {
+export function hexLine(bytes) {
   if (!bytes || !bytes.length) return "";
   let s = "";
   for (let i = 0; i < bytes.length; i++) {
@@ -703,10 +703,10 @@ function hexLine(bytes) {
   }
   return s;
 }
-const BUILD_SHA = true ? "7f4be5c" : "dev";
+const BUILD_SHA = true ? "4e5cc1d" : "dev";
 const MARKETING_MODE = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("marketing") === "1";
-const BUILD_TIME = true ? "2026-06-15T02:04:01Z" : "";
-const BUILD_VERSION = true ? "v0.1.1" : "dev";
+const BUILD_TIME = true ? "2026-06-26T03:57:51Z" : "";
+const BUILD_VERSION = true ? "dev" : "dev";
 const DOWNLOAD_OPTIONS = [1, 3, 5, 10];
 function useNarrow(threshold = 720) {
   const [narrow, setNarrow] = useState(() => typeof window !== "undefined" && window.innerWidth < threshold);
@@ -717,11 +717,11 @@ function useNarrow(threshold = 720) {
   }, [threshold]);
   return narrow;
 }
-function clampNum(n, min, max, fallback) {
+export function clampNum(n, min, max, fallback) {
   if (!Number.isFinite(n)) return fallback;
   return Math.max(min, Math.min(max, n));
 }
-function allowedDownloadCount(n, fallback = 3) {
+export function allowedDownloadCount(n, fallback = 3) {
   return DOWNLOAD_OPTIONS.includes(n) ? n : fallback;
 }
 function tryUpload(blob, { ttl, maxDL }, onProgress) {
@@ -2091,4 +2091,6 @@ function Entry() {
   }
   return /* @__PURE__ */ React.createElement(App, null);
 }
-ReactDOM.createRoot(document.getElementById("root")).render(/* @__PURE__ */ React.createElement(Entry, null));
+if (typeof process === "undefined" || true) {
+  ReactDOM.createRoot(document.getElementById("root")).render(/* @__PURE__ */ React.createElement(Entry, null));
+}
