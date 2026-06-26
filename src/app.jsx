@@ -482,12 +482,12 @@ function generatePassphrase() {
   return [w(), w(), n(), w()].join("-");
 }
 
-function b64uEncode(bytes) {
+export function b64uEncode(bytes) {
   let s = "";
   for (let i = 0; i < bytes.length; i++) s += String.fromCharCode(bytes[i]);
   return btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 }
-function b64uDecode(s) {
+export function b64uDecode(s) {
   s = s.replace(/-/g, "+").replace(/_/g, "/");
   while (s.length % 4) s += "=";
   const bin = atob(s);
@@ -2528,4 +2528,6 @@ function Entry() {
   return <App />;
 }
 
-ReactDOM.createRoot(document.getElementById("root")).render(<Entry />);
+if (typeof process === 'undefined' || process.env.NODE_ENV !== 'test') {
+  ReactDOM.createRoot(document.getElementById("root")).render(<Entry />);
+}
