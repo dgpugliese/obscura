@@ -1,0 +1,4 @@
+127.0.0.1 - - [29/Jun/2026 09:37:05] "GET /app.html HTTP/1.1" 200 -
+127.0.0.1 - - [29/Jun/2026 09:37:05] "GET /app.js HTTP/1.1" 200 -
+127.0.0.1 - - [29/Jun/2026 09:37:06] code 501, message Unsupported method ('POST')
+127.0.0.1 - - [29/Jun/2026 09:37:06] "POST /api/upload HTTP/1.1" 501 -
