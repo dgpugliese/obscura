@@ -16,5 +16,8 @@
   "devDependencies": {
     "esbuild": "^0.28.0",
     "wrangler": "^4.90.0"
+  },
+  "dependencies": {
+    "qrcode-generator": "^2.0.4"
   }
 }
