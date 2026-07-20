@@ -64,7 +64,7 @@
   document.getElementById("uptimePct").textContent = upPct.toFixed(3) + "% uptime";
 
   const incHost = document.getElementById("incidents");
-  incHost.innerHTML = "";
+  incHost.textContent = "";
   if (incidents.length === 0) {
     const empty = document.createElement("div");
     empty.className = "empty";
