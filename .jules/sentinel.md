@@ -1,0 +1,4 @@
+## 2024-07-24 - Fix DOM-based XSS via React dangerouslySetInnerHTML
+**Vulnerability:** The application was using `qr.createSvgTag()` from the `qrcode-generator` library and rendering the resulting SVG string directly into the DOM using React's `dangerouslySetInnerHTML`.
+**Learning:** Even when the input to a library (like a URL fragment) seems safe or is generated internally, passing raw HTML/SVG strings to `dangerouslySetInnerHTML` is a brittle pattern that can easily become a vector for Cross-Site Scripting (XSS) if the input validation ever fails or changes.
+**Prevention:** Avoid `dangerouslySetInnerHTML` whenever possible. For QR codes specifically, use `qr.createDataURL()` and bind the result to the `src` attribute of a standard `<img>` tag, allowing the browser to safely handle the rendering without executing any embedded scripts.
