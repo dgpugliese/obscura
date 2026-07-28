@@ -1,0 +1,4 @@
+## 2026-07-28 - Fix XSS vulnerability in QR code generation
+**Vulnerability:** The application used `dangerouslySetInnerHTML` combined with `qr.createSvgTag()` from the `qrcode-generator` library to render QR codes in the UI.
+**Learning:** Using `dangerouslySetInnerHTML` with dynamically generated SVG output from third-party libraries introduces a significant DOM-based XSS risk. If an attacker can manipulate the input to the QR code generator, they might be able to inject malicious scripts into the SVG markup that get executed when the browser parses and renders it.
+**Prevention:** Avoid `dangerouslySetInnerHTML` whenever possible. For QR codes specifically, use alternative generation methods like `qr.createDataURL()` and render the output safely via an `<img src={...} />` tag. This completely neutralizes the risk of injecting executable scripts into the DOM.
