@@ -1,0 +1,4 @@
+## 2025-02-14 - QR Code XSS Vulnerability via dangerouslySetInnerHTML
+**Vulnerability:** The application used `qrcode-generator`'s `createSvgTag()` paired with `dangerouslySetInnerHTML` to render QR codes in the React frontend.
+**Learning:** Even if data appears safe, passing it to `dangerouslySetInnerHTML` with an SVG string from an external library creates a Cross-Site Scripting (XSS) vulnerability vector.
+**Prevention:** Avoid `dangerouslySetInnerHTML` entirely when generating QR codes. Use the library's `createDataURL()` method and render the output safely via a standard `<img src={...} />` element.
