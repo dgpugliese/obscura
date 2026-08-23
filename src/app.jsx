@@ -1339,7 +1339,7 @@ function HeroDone({ files, onReset, link, onDownload, mode, passphrase, onBurn, 
       qr.addData(link);
       qr.make();
       // cellSize, margin, alt, title, scalable.
-      return qr.createSvgTag({ cellSize: 5, margin: 2, scalable: true });
+      return qr.createDataURL(5, 2);
     } catch (e) {
       console.error("qr generate failed", e);
       return null;
@@ -1440,9 +1440,9 @@ function HeroDone({ files, onReset, link, onDownload, mode, passphrase, onBurn, 
               borderRadius: 3, display: "flex",
               alignItems: "center", justifyContent: "center",
               flex: "0 0 144px",
-            }}
-              dangerouslySetInnerHTML={{ __html: qrSvg.replace(/<svg/, '<svg style="width:100%;height:100%;display:block"') }}
-            />
+            }}>
+              <img src={qrSvg} style={{ width: "100%", height: "100%", display: "block" }} alt="QR Code" />
+            </div>
             <div style={{ minWidth: 0 }}>
               <div style={{ fontFamily: "var(--mono)", fontSize: 10, color: theme.inkFaint, letterSpacing: "0.18em", textTransform: "uppercase" }}>scan to receive</div>
               <div style={{ fontFamily: "var(--mono)", fontSize: 11, color: theme.inkDim, marginTop: 6, lineHeight: 1.6 }}>
