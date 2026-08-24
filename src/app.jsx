@@ -1332,14 +1332,15 @@ function HeroDone({ files, onReset, link, onDownload, mode, passphrase, onBurn, 
     setTimeout(() => setCopied(false), 1400);
   };
 
-  const qrSvg = useMemo(() => {
+  const qrDataUrl = useMemo(() => {
     if (!showQR || !link || typeof qrcode === "undefined") return null;
     try {
       const qr = qrcode(0, "M");
       qr.addData(link);
       qr.make();
-      // cellSize, margin, alt, title, scalable.
-      return qr.createSvgTag({ cellSize: 5, margin: 2, scalable: true });
+      // cellSize, margin.
+      // Security: Use createDataURL instead of createSvgTag to prevent XSS via dangerouslySetInnerHTML
+      return qr.createDataURL(5, 2);
     } catch (e) {
       console.error("qr generate failed", e);
       return null;
@@ -1426,7 +1427,7 @@ function HeroDone({ files, onReset, link, onDownload, mode, passphrase, onBurn, 
             borderRadius: 4, cursor: "pointer",
           }}>NEW</button>
         </div>
-        {showQR && qrSvg && (
+        {showQR && qrDataUrl && (
           <div style={{
             marginTop: 12, padding: 14,
             border: `1px solid ${theme.border}`,
@@ -1434,15 +1435,12 @@ function HeroDone({ files, onReset, link, onDownload, mode, passphrase, onBurn, 
             borderRadius: 4,
             display: "flex", alignItems: "center", gap: 14,
           }}>
-            <div style={{
+            <img src={qrDataUrl} style={{
               width: 144, height: 144,
               background: "#fff", padding: 6,
-              borderRadius: 3, display: "flex",
-              alignItems: "center", justifyContent: "center",
+              borderRadius: 3, display: "block",
               flex: "0 0 144px",
-            }}
-              dangerouslySetInnerHTML={{ __html: qrSvg.replace(/<svg/, '<svg style="width:100%;height:100%;display:block"') }}
-            />
+            }} alt="QR Code" />
             <div style={{ minWidth: 0 }}>
               <div style={{ fontFamily: "var(--mono)", fontSize: 10, color: theme.inkFaint, letterSpacing: "0.18em", textTransform: "uppercase" }}>scan to receive</div>
               <div style={{ fontFamily: "var(--mono)", fontSize: 11, color: theme.inkDim, marginTop: 6, lineHeight: 1.6 }}>
