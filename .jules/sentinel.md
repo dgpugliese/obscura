@@ -1,0 +1,4 @@
+## 2023-10-27 - [DOM-based XSS Prevention in React & Vanilla JS]
+**Vulnerability:** Usage of `dangerouslySetInnerHTML` for generating SVG QR codes in React (`src/app.jsx`) and `innerHTML` for clearing DOM content in Vanilla JS (`status.js`).
+**Learning:** Even well-intended usages of rendering SVG tags directly via `dangerouslySetInnerHTML` or quickly clearing nodes with `.innerHTML = ""` expose the application to cross-site scripting vectors. Using simpler built-ins (Data URLs with standard `<img>` tags, and `.textContent`) achieves the same goal without circumventing the safety mechanisms of the DOM and React.
+**Prevention:** Avoid `dangerouslySetInnerHTML` and `innerHTML`. When using libraries to generate assets like QR codes, prefer output formats like Data URLs (`createDataURL`) that can be safely embedded in natively sandboxed attributes (`src`). For clearing elements, use `.textContent = ""`.
