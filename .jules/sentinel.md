@@ -1,0 +1,4 @@
+## 2024-05-18 - Prevent XSS in QR Code Generation
+**Vulnerability:** Generating QR codes using `qr.createSvgTag()` combined with `dangerouslySetInnerHTML` allows for potential DOM-based Cross-Site Scripting (XSS) if the generated input string is tampered with or poorly sanitized.
+**Learning:** `qrcode-generator` output should not be trusted implicitly for raw HTML injection.
+**Prevention:** Avoid `createSvgTag()`. Instead, use `createDataURL()` which generates a Base64 string that can be safely loaded as the `src` attribute of a standard `<img>` tag without rendering raw markup directly in the DOM.
