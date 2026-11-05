@@ -1338,8 +1338,8 @@ function HeroDone({ files, onReset, link, onDownload, mode, passphrase, onBurn, 
       const qr = qrcode(0, "M");
       qr.addData(link);
       qr.make();
-      // cellSize, margin, alt, title, scalable.
-      return qr.createSvgTag({ cellSize: 5, margin: 2, scalable: true });
+      // SECURITY: Avoid createSvgTag with dangerouslySetInnerHTML to prevent XSS. Use Data URL instead.
+      return qr.createDataURL(5, 2);
     } catch (e) {
       console.error("qr generate failed", e);
       return null;
@@ -1434,14 +1434,15 @@ function HeroDone({ files, onReset, link, onDownload, mode, passphrase, onBurn, 
             borderRadius: 4,
             display: "flex", alignItems: "center", gap: 14,
           }}>
-            <div style={{
-              width: 144, height: 144,
-              background: "#fff", padding: 6,
-              borderRadius: 3, display: "flex",
-              alignItems: "center", justifyContent: "center",
-              flex: "0 0 144px",
-            }}
-              dangerouslySetInnerHTML={{ __html: qrSvg.replace(/<svg/, '<svg style="width:100%;height:100%;display:block"') }}
+            <img
+              src={qrSvg}
+              alt="QR Code"
+              style={{
+                width: 144, height: 144,
+                background: "#fff", padding: 6,
+                borderRadius: 3, display: "block",
+                flex: "0 0 144px",
+              }}
             />
             <div style={{ minWidth: 0 }}>
               <div style={{ fontFamily: "var(--mono)", fontSize: 10, color: theme.inkFaint, letterSpacing: "0.18em", textTransform: "uppercase" }}>scan to receive</div>
